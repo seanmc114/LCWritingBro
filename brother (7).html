@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
+  <title>The Brother — LC Spanish</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Nunito:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #1c1917; --paper: #faf7f2; --aged: #f0ead6;
+      --brother: #1a5c38; --brother-light: #e8f5ee;
+      --gold: #b45309; --coral: #be123c; --muted: #78716c; --border: #d6d3c4; --red: #c0392b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Nunito', sans-serif; background: var(--paper); min-height: 100vh; color: var(--ink); }
+    .screen { display: none; min-height: 100vh; }
+    .screen.active { display: flex; flex-direction: column; }
+
+    /* WELCOME */
+    #screen-welcome { justify-content: center; align-items: center; background: var(--ink); padding: 30px 20px; position: relative; overflow: hidden; }
+    #screen-welcome::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 30% 40%, rgba(26,92,56,0.25) 0%, transparent 60%); }
+    .welcome-inner { position: relative; z-index: 1; max-width: 480px; width: 100%; text-align: center; }
+    .brother-figure { margin-bottom: 14px; animation: brotherBob 4s ease-in-out infinite; display: block; filter: drop-shadow(0 0 20px rgba(26,92,56,0.4)); margin: 0 auto 14px; }
+    @keyframes brotherBob { 0%,100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-10px) rotate(2deg); } }
+    .welcome-title { font-family: 'Lora', serif; font-size: 2.4rem; font-weight: 600; color: white; margin-bottom: 4px; }
+    .welcome-sub { color: rgba(255,255,255,0.38); font-size: 0.78rem; margin-bottom: 28px; letter-spacing: 1px; text-transform: uppercase; }
+    .welcome-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 18px; padding: 24px 20px; margin-bottom: 16px; }
+    .field-label { color: rgba(255,255,255,0.45); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 7px; display: block; text-align: left; }
+    .field-input { width: 100%; background: rgba(255,255,255,0.08); border: 2px solid rgba(255,255,255,0.12); border-radius: 10px; color: white; font-family: 'Nunito', sans-serif; font-size: 1rem; font-weight: 600; padding: 11px 14px; outline: none; transition: border-color 0.2s; margin-bottom: 16px; }
+    .field-input:focus { border-color: var(--brother); }
+    .field-input::placeholder { color: rgba(255,255,255,0.18); }
+    .grade-row { display: flex; gap: 6px; flex-wrap: wrap; }
+    .grade-btn { flex: 1; min-width: 50px; background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1); border-radius: 8px; color: rgba(255,255,255,0.45); font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.82rem; padding: 9px 4px; cursor: pointer; transition: all 0.2s; text-align: center; }
+    .grade-btn:hover { border-color: rgba(26,92,56,0.5); color: white; }
+    .grade-btn.selected { background: var(--brother); border-color: var(--brother); color: white; }
+    .grade-btn.ol.selected { background: var(--gold); border-color: var(--gold); }
+    .enter-btn { width: 100%; padding: 15px; background: var(--brother); color: white; font-family: 'Nunito', sans-serif; font-size: 1.05rem; font-weight: 900; border: none; border-radius: 12px; cursor: pointer; transition: all 0.2s; margin-top: 12px; }
+    .enter-btn:hover { filter: brightness(1.12); }
+    .turbo-note { color: rgba(255,255,255,0.28); font-size: 0.75rem; margin-top: 12px; font-style: italic; }
+
+    /* REVEAL */
+    #screen-reveal { justify-content: center; align-items: center; background: var(--ink); padding: 40px 20px; }
+    .reveal-inner { max-width: 440px; width: 100%; text-align: center; }
+    .brother-big { font-size: 6rem; display: block; animation: revealFloat 2s ease-in-out infinite; filter: drop-shadow(0 0 40px rgba(26,92,56,0.8)); margin-bottom: 16px; }
+    @keyframes revealFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
+    .reveal-text { font-family: 'Lora', serif; font-size: 1.5rem; color: white; margin-bottom: 10px; line-height: 1.4; }
+    .reveal-sub { color: rgba(255,255,255,0.42); font-size: 0.9rem; margin-bottom: 28px; line-height: 1.65; white-space: pre-line; }
+    .reveal-btn { background: var(--brother); color: white; font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1rem; padding: 14px 36px; border: none; border-radius: 12px; cursor: pointer; transition: all 0.2s; }
+    .reveal-btn:hover { filter: brightness(1.12); }
+
+    /* COACH */
+    #screen-coach { background: var(--paper); flex-direction: column; max-width: 680px; margin: 0 auto; width: 100%; }
+    .coach-header { background: var(--ink); padding: 12px 16px; display: flex; align-items: center; gap: 10px; position: sticky; top: 0; z-index: 100; flex-shrink: 0; }
+    .ch-brother { font-size: 1.6rem; animation: brotherBob 4s ease-in-out infinite; }
+    .ch-info { flex: 1; }
+    .ch-name { font-family: 'Lora', serif; color: white; font-size: 0.9rem; font-weight: 600; }
+    .ch-grade { color: rgba(255,255,255,0.38); font-size: 0.68rem; }
+    .ch-actions { display: flex; gap: 6px; align-items: center; }
+    .hdr-btn { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.55); font-family: 'Nunito', sans-serif; font-size: 0.7rem; font-weight: 700; padding: 5px 10px; border-radius: 7px; cursor: pointer; transition: all 0.2s; }
+    .hdr-btn:hover { background: rgba(255,255,255,0.14); color: white; }
+    .q-btn { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); color: white; font-size: 0.9rem; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-weight: 900; font-family: 'Nunito', sans-serif; }
+
+    .coach-body { flex: 1; overflow-y: auto; padding: 18px 16px; display: flex; flex-direction: column; gap: 14px; }
+
+    /* Messages */
+    .b-msg { display: flex; gap: 9px; align-self: flex-start; max-width: 94%; animation: msgIn 0.3s ease; }
+    @keyframes msgIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+    .b-av { width: 32px; height: 32px; border-radius: 50%; background: var(--brother); display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; margin-top: 2px; }
+    .b-bub { background: white; border: 1px solid var(--border); border-radius: 14px; border-top-left-radius: 4px; padding: 12px 15px; font-size: 0.9rem; line-height: 1.6; color: var(--ink); box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
+    .b-bub p { margin-bottom: 8px; }
+    .b-bub p:last-child { margin-bottom: 0; }
+
+    /* Prompt */
+    .prompt-card { background: white; border: 2px solid var(--brother); border-radius: 14px; padding: 16px 18px; }
+    .prompt-label { font-size: 0.66rem; font-weight: 900; color: var(--brother); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+    .prompt-title { font-family: 'Lora', serif; font-size: 0.98rem; font-weight: 600; color: var(--ink); margin-bottom: 10px; line-height: 1.45; }
+    .prompt-bullets { list-style: none; }
+    .prompt-bullets li { font-size: 0.86rem; color: var(--ink); padding: 3px 0 3px 16px; position: relative; line-height: 1.4; }
+    .prompt-bullets li::before { content: '→'; position: absolute; left: 0; color: var(--brother); font-weight: 700; font-size: 0.8rem; }
+
+    /* Write zone */
+    .write-zone { background: white; border: 2px solid var(--border); border-radius: 14px; padding: 14px 16px; transition: border-color 0.2s; }
+    .write-zone:focus-within { border-color: var(--brother); }
+    .write-label { font-size: 0.66rem; font-weight: 900; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; display: flex; justify-content: space-between; }
+    .word-count { font-weight: 400; font-style: italic; }
+    .write-ta { width: 100%; border: none; outline: none; font-family: 'Lora', serif; font-size: 0.93rem; line-height: 1.7; color: var(--ink); resize: none; min-height: 170px; background: none; }
+    .write-ta::placeholder { color: #ccc; font-style: italic; }
+    .write-footer { display: flex; justify-content: flex-end; margin-top: 10px; border-top: 1px solid var(--border); padding-top: 10px; }
+    .submit-btn { background: var(--red); color: white; border: none; border-radius: 10px; padding: 11px 24px; font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 0.92rem; cursor: pointer; transition: all 0.2s; }
+    .submit-btn:hover { filter: brightness(1.1); }
+    .submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* Nudge */
+    .nudge { background: #fff8e1; border: 2px solid #f39c12; border-radius: 12px; padding: 11px 15px; font-size: 0.86rem; color: #7f4f00; }
+
+    /* Mark card */
+    .mark-card { background: white; border: 2px solid var(--border); border-radius: 14px; padding: 16px 18px; }
+    .mark-label { font-size: 0.66rem; font-weight: 900; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+    .mark-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+    .mark-item { background: var(--aged); border-radius: 10px; padding: 10px 12px; }
+    .mark-item-label { font-size: 0.66rem; font-weight: 900; color: var(--muted); text-transform: uppercase; margin-bottom: 2px; }
+    .mark-item-val { font-size: 1.35rem; font-weight: 900; color: var(--ink); }
+    .mark-item-val span { font-size: 0.72rem; color: var(--muted); font-weight: 400; }
+    .mark-total { text-align: center; border-radius: 10px; padding: 12px; margin-bottom: 12px; color: white; }
+    .mark-total-num { font-size: 2rem; font-weight: 900; }
+    .mark-total-sub { font-size: 0.75rem; opacity: 0.75; margin-top: 2px; }
+    .mark-feedback { font-size: 0.87rem; line-height: 1.6; border-top: 1px solid var(--border); padding-top: 12px; }
+    .mark-feedback p { margin-bottom: 8px; }
+    .mark-feedback p:last-child { margin-bottom: 0; }
+
+    /* Prescription */
+    .prescription { background: var(--brother-light); border: 2px solid var(--brother); border-radius: 12px; padding: 14px 16px; }
+    .presc-label { font-size: 0.66rem; font-weight: 900; color: var(--brother); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+    .presc-text { font-size: 0.88rem; color: var(--ink); line-height: 1.55; margin-bottom: 10px; }
+    .turbo-link { display: inline-block; background: var(--brother); color: white; font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 0.86rem; padding: 9px 20px; border-radius: 9px; text-decoration: none; }
+
+    /* Actions */
+    .action-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .action-btn { flex: 1; min-width: 130px; padding: 12px; background: white; border: 2px solid var(--brother); color: var(--brother); font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 0.86rem; border-radius: 10px; cursor: pointer; transition: all 0.2s; text-align: center; }
+    .action-btn:hover { background: var(--brother); color: white; }
+    .action-btn.primary { background: var(--brother); color: white; }
+
+    /* Typing */
+    .typing-ind { display: flex; align-items: center; gap: 5px; padding: 10px 14px; background: white; border: 1px solid var(--border); border-radius: 14px; border-top-left-radius: 4px; width: fit-content; }
+    .t-dot { width: 7px; height: 7px; background: var(--muted); border-radius: 50%; animation: tBounce 1.2s ease infinite; }
+    .t-dot:nth-child(2) { animation-delay: 0.2s; }
+    .t-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes tBounce { 0%,60%,100% { transform:translateY(0); } 30% { transform:translateY(-6px); } }
+
+    /* Graph */
+    #screen-graph { background: var(--paper); flex-direction: column; max-width: 680px; margin: 0 auto; width: 100%; }
+    .graph-header { background: var(--ink); padding: 12px 16px; display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+    .graph-header h2 { font-family: 'Lora', serif; color: white; font-size: 1rem; flex: 1; }
+    .graph-body { flex: 1; padding: 18px 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; }
+    .graph-box { background: white; border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
+    .graph-box-title { font-size: 0.7rem; font-weight: 900; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px; }
+    canvas { display: block; }
+    .graph-legend { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+    .leg-item { display: flex; align-items: center; gap: 5px; font-size: 0.7rem; color: var(--muted); }
+    .leg-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .attempt-row { background: white; border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; }
+    .att-num { font-size: 0.7rem; font-weight: 900; color: var(--muted); width: 22px; flex-shrink: 0; }
+    .att-type { font-size: 0.8rem; color: var(--ink); flex: 1; }
+    .att-total { font-size: 1.1rem; font-weight: 900; color: var(--brother); }
+
+    /* Criteria overlay */
+    .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 999; padding: 20px; align-items: flex-end; justify-content: center; }
+    .overlay.open { display: flex; }
+    .overlay-box { background: white; border-radius: 18px 18px 18px 18px; padding: 22px 20px; max-width: 440px; width: 100%; max-height: 85vh; overflow-y: auto; }
+    .overlay-box h3 { font-family: 'Lora', serif; font-size: 1.05rem; margin-bottom: 16px; }
+    .crit { margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+    .crit:last-of-type { margin-bottom: 0; padding-bottom: 0; border: none; }
+    .crit-name { font-weight: 900; color: var(--brother); font-size: 0.86rem; margin-bottom: 4px; }
+    .crit-name span { color: var(--muted); font-weight: 400; }
+    .crit-desc { font-size: 0.83rem; color: var(--ink); line-height: 1.55; }
+    .close-btn { width: 100%; margin-top: 16px; padding: 12px; background: var(--ink); color: white; border: none; border-radius: 10px; font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 0.9rem; cursor: pointer; }
+
+    footer { text-align: center; font-size: 0.66rem; color: rgba(255,255,255,0.18); padding: 10px; flex-shrink: 0; }
+    footer.light { color: var(--muted); }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner { display: inline-block; width: 15px; height: 15px; border: 2px solid rgba(26,92,56,0.2); border-top-color: var(--brother); border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; }
+  </style>
+</head>
+<body>
+
+<!-- CRITERIA OVERLAY -->
+<div class="overlay" id="criteria-overlay" onclick="closeCriteria()">
+  <div class="overlay-box" onclick="event.stopPropagation()">
+    <h3>How The Brother marks your writing</h3>
+    <div class="crit">
+      <div class="crit-name">Content <span>— out of 10</span></div>
+      <div class="crit-desc">Did you actually answer the question? Did you cover the bullet points you were given? If the prompt asks for your opinion and your future plans and you only write about your opinion — you lose marks here.</div>
+    </div>
+    <div class="crit">
+      <div class="crit-name">Accuracy <span>— out of 10</span></div>
+      <div class="crit-desc">Did you get your Spanish right? Tense agreements, noun-adjective agreement, verb forms, spelling. Every error a Spanish person would notice costs you marks here.</div>
+    </div>
+    <div class="crit">
+      <div class="crit-name">Range <span>— out of 10</span></div>
+      <div class="crit-desc">Did you use different words and structures, or the same five phrases on repeat? Did you mix your tenses — past, present, future, conditional? This is where H1s separate from H3s. The examiner wants to see variety.</div>
+    </div>
+    <div class="crit">
+      <div class="crit-name">Communication <span>— out of 10</span></div>
+      <div class="crit-desc">Could a Spanish person read this and understand you? Does it flow naturally? Are you using connectors — sin embargo, además, por eso, aunque? A technically correct answer that reads like a disconnected list loses marks here.</div>
+    </div>
+    <button class="close-btn" type="button" onclick="closeCriteria()">Got it</button>
+  </div>
+</div>
+
+<!-- SCREEN 1: WELCOME -->
+<div id="screen-welcome" class="screen active">
+  <div class="welcome-inner">
+    <svg class="brother-figure" viewBox="0 0 200 260" width="120" height="156" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="100" cy="190" rx="58" ry="72" fill="#2d5a27"/><rect x="42" y="155" width="116" height="100" rx="20" fill="#2d5a27"/><rect x="84" y="155" width="32" height="90" rx="4" fill="#f0ead6"/><path d="M42 165 Q55 155 72 152 L84 155 L84 245 Q62 240 42 220Z" fill="#3d7a35"/><path d="M158 165 Q145 155 128 152 L116 155 L116 245 Q138 240 158 220Z" fill="#3d7a35"/><ellipse cx="28" cy="195" rx="20" ry="52" fill="#2d5a27"/><ellipse cx="172" cy="195" rx="20" ry="52" fill="#2d5a27"/><ellipse cx="28" cy="238" rx="16" ry="14" fill="#d4956a"/><ellipse cx="172" cy="238" rx="16" ry="14" fill="#d4956a"/><rect x="86" y="128" width="28" height="32" rx="8" fill="#d4956a"/><ellipse cx="100" cy="100" rx="54" ry="60" fill="#d4956a"/><ellipse cx="100" cy="52" rx="52" ry="28" fill="#e8e2d0"/><path d="M48 72 Q44 55 50 42 Q58 28 72 24 Q86 20 100 20 Q114 20 128 24 Q142 28 150 42 Q156 55 152 72" fill="#e8e2d0"/><path d="M48 85 Q42 95 44 108" fill="none" stroke="#e8e2d0" stroke-width="10" stroke-linecap="round"/><path d="M152 85 Q158 95 156 108" fill="none" stroke="#e8e2d0" stroke-width="10" stroke-linecap="round"/><ellipse cx="100" cy="80" rx="44" ry="22" fill="#d4956a"/><path d="M68 90 Q82 84 96 90" fill="none" stroke="#a09080" stroke-width="4" stroke-linecap="round"/><path d="M104 90 Q118 84 132 90" fill="none" stroke="#a09080" stroke-width="4" stroke-linecap="round"/><ellipse cx="82" cy="102" rx="13" ry="10" fill="#f0ede6"/><ellipse cx="118" cy="102" rx="13" ry="10" fill="#f0ede6"/><ellipse cx="82" cy="103" rx="7" ry="8" fill="#5a3e28"/><ellipse cx="118" cy="103" rx="7" ry="8" fill="#5a3e28"/><ellipse cx="82" cy="103" rx="4" ry="4.5" fill="#1a1208"/><ellipse cx="118" cy="103" rx="4" ry="4.5" fill="#1a1208"/><ellipse cx="84" cy="100" rx="2" ry="2" fill="white"/><ellipse cx="120" cy="100" rx="2" ry="2" fill="white"/><ellipse cx="82" cy="103" rx="15" ry="12" fill="rgba(200,220,255,0.12)" stroke="#7a6a5a" stroke-width="2"/><ellipse cx="118" cy="103" rx="15" ry="12" fill="rgba(200,220,255,0.12)" stroke="#7a6a5a" stroke-width="2"/><path d="M97 103 Q100 100 103 103" fill="none" stroke="#7a6a5a" stroke-width="2"/><ellipse cx="100" cy="118" rx="9" ry="7" fill="#c08060"/><path d="M84 132 Q100 142 116 132" fill="none" stroke="#8a5a3a" stroke-width="2.5" stroke-linecap="round"/><ellipse cx="46" cy="105" rx="9" ry="13" fill="#c08060"/><ellipse cx="154" cy="105" rx="9" ry="13" fill="#c08060"/>
+    </svg>
+    <h1 class="welcome-title">The Brother</h1>
+    <p class="welcome-sub">LC Spanish · Section C · Exam Prep</p>
+    <div class="welcome-card">
+      <label class="field-label">Your first name</label>
+      <input class="field-input" id="inp-name" type="text" placeholder="What do they call you?" maxlength="30" autocomplete="off">
+      <label class="field-label">Your target grade</label>
+      <div class="grade-row">
+        <button class="grade-btn hl" type="button" data-grade="H1" onclick="selectGrade(this)">H1</button>
+        <button class="grade-btn hl" type="button" data-grade="H2" onclick="selectGrade(this)">H2</button>
+        <button class="grade-btn hl" type="button" data-grade="H3" onclick="selectGrade(this)">H3</button>
+        <button class="grade-btn hl" type="button" data-grade="H4" onclick="selectGrade(this)">H4</button>
+        <button class="grade-btn ol" type="button" data-grade="O1" onclick="selectGrade(this)">O1</button>
+        <button class="grade-btn ol" type="button" data-grade="O2" onclick="selectGrade(this)">O2</button>
+        <button class="grade-btn ol" type="button" data-grade="O3" onclick="selectGrade(this)">O3</button>
+      </div>
+    </div>
+    <button class="enter-btn" type="button" onclick="enterBrother()">Enter →</button>
+    <p class="turbo-note" id="turbo-note">Loading your Turbo data...</p>
+    <footer>© 2026 Synge Street Games: Imagination and Perseverance</footer>
+  </div>
+</div>
+
+<!-- SCREEN 2: REVEAL -->
+<div id="screen-reveal" class="screen">
+  <div class="reveal-inner" style="position:relative;z-index:1;text-align:center;">
+    <span class="brother-big">🧓</span>
+    <p class="reveal-text" id="reveal-text">Right. Sit down.</p>
+    <p class="reveal-sub" id="reveal-sub">Let's see what you've got.</p>
+    <button class="reveal-btn" type="button" onclick="goToCoach()">Let's go →</button>
+    <footer style="margin-top:24px;">© 2026 Synge Street Games: Imagination and Perseverance</footer>
+  </div>
+</div>
+
+<!-- SCREEN 3: COACH -->
+<div id="screen-coach" class="screen">
+  <div class="coach-header">
+    <span class="ch-brother">🧓</span>
+    <div class="ch-info">
+      <div class="ch-name">The Brother — LC Spanish</div>
+      <div class="ch-grade" id="header-grade">Section C · Target: —</div>
+    </div>
+    <div class="ch-actions">
+      <button class="q-btn" type="button" onclick="openCriteria()" title="Marking explained">?</button>
+      <button class="hdr-btn" type="button" onclick="showScreen('screen-graph')">📈 Progress</button>
+      <button class="hdr-btn" type="button" onclick="showScreen('screen-welcome')">Home</button>
+    </div>
+  </div>
+  <div class="coach-body" id="coach-body"></div>
+  <footer class="light">© 2026 Synge Street Games: Imagination and Perseverance</footer>
+</div>
+
+<!-- SCREEN 4: GRAPH -->
+<div id="screen-graph" class="screen">
+  <div class="graph-header">
+    <span style="font-size:1.3rem">📈</span>
+    <h2>Your Progress</h2>
+    <button class="hdr-btn" type="button" onclick="showScreen('screen-coach')">← Back</button>
+  </div>
+  <div class="graph-body">
+    <div class="graph-box">
+      <div class="graph-box-title">Total score per attempt — out of 40</div>
+      <canvas id="progress-chart" style="width:100%;height:200px;"></canvas>
+      <div class="graph-legend">
+        <div class="leg-item"><div class="leg-dot" style="background:#1a5c38"></div>Total /40</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#2980b9"></div>Content</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#c0392b"></div>Accuracy</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#f39c12"></div>Range</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#8e44ad"></div>Communication</div>
+      </div>
+    </div>
+    <div id="attempt-list" style="display:flex;flex-direction:column;gap:8px;"></div>
+  </div>
+  <footer class="light">© 2026 Synge Street Games: Imagination and Perseverance</footer>
+</div>
+
+<script>
+const WORKER_URL = 'https://patient-morning-62fc.seansynge.workers.dev';
+
+// ============================================================
+// EXAM PROMPTS — real LC Section C style
+// ============================================================
+const PROMPTS = {
+  dialogue: [
+    { title: 'Write a dialogue between you and a Spanish friend about your plans after the Leaving Cert.', bullets: ['What you plan to do when the exams are over', 'Whether you want to go to college or work', 'Where you hope to live in the future', 'Your hopes and dreams for the next few years'] },
+    { title: 'Write a dialogue between you and a Spanish exchange student visiting your school.', bullets: ['How you find school life in Ireland compared to Spain', 'What subjects you study and which you prefer', 'What you do after school and at weekends', 'Your opinion of Irish weather and food'] },
+    { title: 'Write a dialogue between you and a Spanish friend about a recent holiday.', bullets: ['Where you went and how you travelled', 'What the accommodation and food were like', 'The best and worst moments of the trip', 'Whether you would go back and why'] },
+    { title: 'Write a dialogue between you and a Spanish friend about healthy living and sport.', bullets: ['What sport or exercise you do and how often', 'Your opinions on the importance of sport for young people', 'Your eating habits and what you think of fast food', 'What changes you would make to live more healthily'] },
+    { title: 'Write a dialogue between you and a Spanish friend about social media and phones.', bullets: ['How much time you spend on your phone each day', 'Which apps or platforms you use most and why', 'The advantages and disadvantages of social media for young people', 'Whether you think there should be more restrictions on screen time'] },
+    { title: 'Write a dialogue between you and a Spanish friend about music and entertainment.', bullets: ['What kind of music you listen to and why you like it', 'How you spend your free time at weekends', 'A concert, film or event you went to recently', 'How important music or entertainment is in your life'] },
+    { title: 'Write a dialogue between you and a Spanish friend about the environment.', bullets: ['What environmental problems concern you most', 'What you personally do to help the environment', 'Whether young people care enough about climate change', 'What you think governments need to do'] },
+    { title: 'Write a dialogue between you and a Spanish friend about school and education.', bullets: ['What your school is like and how you feel about it', 'Which subjects you find most useful for the future', 'Whether the Leaving Cert is a fair way to assess students', 'What you would change about school if you could'] },
+  ],
+  diary: [
+    { title: 'Write a diary entry about a day that did not go as planned.', bullets: ['What you had planned to do that day', 'What went wrong and how it happened', 'How you felt at the time', 'What you learned or how things improved by the end'] },
+    { title: 'Write a diary entry about an important event in your life this year.', bullets: ['What the event was and when it took place', 'Who was involved and what happened', 'How you felt before, during and after', 'Why this event was significant to you'] },
+    { title: 'Write a diary entry about a time you felt proud of yourself.', bullets: ['What you achieved that made you proud', 'How long you had been working towards it', 'How those around you reacted', 'What this achievement means for your future'] },
+    { title: 'Write a diary entry about a difficult week at school.', bullets: ['What made the week particularly hard', 'How you managed the pressure and stress', 'Who helped you or how you helped yourself', 'How you felt by Friday'] },
+    { title: 'Write a diary entry about your feelings as the Leaving Cert approaches.', bullets: ['How you feel about the upcoming exams', 'How you have been preparing and whether you feel ready', 'What subject worries you most and why', 'What you are most looking forward to when the exams are over'] },
+    { title: 'Write a diary entry about a time you had a disagreement with someone close to you.', bullets: ['What the disagreement was about and how it started', 'How you felt during and after it', 'Whether and how you resolved the situation', 'What the experience taught you'] },
+    { title: 'Write a diary entry about a journey or trip that was memorable for unexpected reasons.', bullets: ['Where you were going and why', 'What went unexpectedly during the trip', 'How you dealt with the unexpected situation', 'How you look back on it now'] },
+    { title: 'Write a diary entry about the first day of a new experience — a job, a trip, a course.', bullets: ['Where you were and why you were there', 'What you expected and what the reality was', 'The most interesting or surprising thing that happened', 'How you feel about what lies ahead'] },
+  ],
+  note: [
+    { title: 'Write a note to your Spanish friend explaining why you cannot meet as planned and suggesting an alternative.', bullets: ['Why you cannot make the original arrangement', 'How sorry you are about this', 'An alternative time or place you are suggesting', 'Something you are looking forward to doing together'] },
+    { title: 'Write an email to your Spanish friend telling them about your school and asking about theirs.', bullets: ['A description of your school — size, subjects, atmosphere', 'Your favourite and least favourite aspects of school', 'Two or three questions about your friend\'s school in Spain', 'An invitation to visit Ireland someday'] },
+    { title: 'Write a note inviting your Spanish friend to visit Ireland this summer.', bullets: ['When you would like them to visit and for how long', 'What you have planned for them to see and do', 'Practical information about travel and what to bring', 'How excited you are about seeing them'] },
+    { title: 'Write an email to your Spanish friend congratulating them on some good news.', bullets: ['What the good news is and how you heard it', 'Why you are so pleased for them', 'A memory you share that makes this news special', 'Plans you would like to make together to celebrate'] },
+    { title: 'Write a note to your Spanish friend asking for their advice about a problem.', bullets: ['What the problem is and how long it has been bothering you', 'Why you have decided to tell your friend', 'What you have already tried', 'What kind of advice or support you are hoping for'] },
+    { title: 'Write an email telling your Spanish friend about a film or series you have been watching.', bullets: ['What you have been watching and where', 'A brief description of the story without spoiling it', 'Why you think your friend would enjoy it', 'A question about what they have been watching'] },
+    { title: 'Write a note to your Spanish friend telling them about a recent family event.', bullets: ['What the event was and when it happened', 'Who was there and what took place', 'The best moment of the occasion', 'How your family felt about it'] },
+    { title: 'Write an email telling your Spanish friend about a new hobby you have taken up.', bullets: ['What the hobby is and how you got started', 'What you enjoy most about it', 'How much time you spend on it', 'Whether you think your friend would enjoy it too'] },
+  ],
+  opinion: [
+    { title: 'Write an opinion piece on whether young people today have it easier or harder than previous generations.', bullets: ['Your clear opinion on the question', 'At least two reasons to support your view', 'A counterargument — what people who disagree might say', 'Your conclusion and what you think needs to change'] },
+    { title: 'Write an opinion piece on the impact of social media on young people\'s mental health.', bullets: ['Your overall view on social media and mental health', 'Specific ways social media can be harmful', 'Any positive aspects or counterarguments', 'What you think young people or governments should do'] },
+    { title: 'Write an opinion piece on whether sport should be compulsory in all secondary schools.', bullets: ['Your clear position on the issue', 'The benefits of compulsory sport', 'Arguments against it and your response', 'What you think schools should do'] },
+    { title: 'Write an opinion piece on whether the Leaving Cert is the best way to assess students.', bullets: ['Your opinion on the current system', 'What it does well', 'Its main weaknesses or unfairnesses', 'What you would change'] },
+    { title: 'Write an opinion piece on the importance of learning foreign languages in school.', bullets: ['Why languages are important — or not', 'The personal and professional benefits', 'Whether Ireland does enough to promote language learning', 'What changes you would recommend'] },
+    { title: 'Write an opinion piece on whether young people care enough about climate change.', bullets: ['Your view on young people\'s attitudes to the environment', 'Evidence or examples to support your point', 'What young people are doing well and where they fall short', 'What more needs to be done'] },
+    { title: 'Write an opinion piece on the role of technology in education.', bullets: ['Your overall view on technology in the classroom', 'The benefits it brings to teaching and learning', 'The risks of too much technology in school', 'What the right balance should be'] },
+    { title: 'Write an opinion piece on whether it is better to live in a city or in the countryside.', bullets: ['Your clear preference and the main reasons for it', 'The advantages of your chosen lifestyle', 'The main disadvantages and how you would deal with them', 'Whether your view might change as you get older'] },
+  ],
+  formal: [
+    { title: 'Write a formal letter to a Spanish company applying for a summer work placement.', bullets: ['Why you are writing and where you saw the placement advertised', 'Your relevant experience, skills and personal qualities', 'Why you are interested in this particular company', 'What you hope to gain from the placement'] },
+    { title: 'Write a formal letter of complaint to a hotel where you had a disappointing stay.', bullets: ['When you stayed and what you had booked', 'The specific problems you experienced', 'How staff responded at the time', 'What you expect the hotel to do — refund, apology, compensation'] },
+    { title: 'Write a formal letter to a Spanish newspaper responding to an article about young Irish people.', bullets: ['What the article said that you agreed or disagreed with', 'Your personal experience as a young Irish person', 'Evidence or examples to support your view', 'What you would like readers to understand about Ireland\'s young people'] },
+    { title: 'Write a formal letter applying for a scholarship to study Spanish at a university in Spain.', bullets: ['Why you want to study in Spain and why this scholarship', 'Your academic achievements and why you deserve the award', 'Your experience with Spanish language and culture', 'How studying in Spain would benefit your future'] },
+    { title: 'Write a formal letter to a Spanish tourism board suggesting ways to attract more Irish visitors.', bullets: ['Why you are writing and your interest in Spain', 'What Irish visitors particularly enjoy about Spain', 'Two or three specific suggestions for attracting more tourists', 'Why you think these changes would make a difference'] },
+    { title: 'Write a formal letter to the organiser of a Spanish summer language course asking for information.', bullets: ['Why you are interested in the course', 'The level of Spanish you currently have', 'Three or four specific questions you need answered', 'When you need the information by and how to contact you'] },
+    { title: 'Write a formal letter to a Spanish employer explaining a gap in your CV.', bullets: ['What the gap was and when it occurred', 'Why it happened and what you did during that time', 'What you learned from the experience', 'Why you are now ready and motivated to work for them'] },
+    { title: 'Write a formal letter of complaint about a product you purchased online from a Spanish company.', bullets: ['What the product was and when you ordered it', 'What was wrong with it when it arrived', 'What inconvenience this caused you', 'What action you expect the company to take'] },
+  ],
+};
+
+// ============================================================
+// STATE
+// ============================================================
+const state = {
+  name: '', grade: 'H3',
+  turboData: null, totalStars: 0,
+  currentPrompt: null, currentType: null,
+  attempts: [],
+  firstVisit: true,
+  nudgeT1: null, nudgeT2: null,
+  usedPrompts: {},
+};
+
+const TYPE_LABELS = { dialogue:'💬 Dialogue', diary:'📔 Diary Entry', note:'✉️ Note / Email', opinion:'🗣️ Opinion Piece', formal:'📋 Formal Letter' };
+const TYPE_KEYS = ['dialogue','diary','note','opinion','formal'];
+
+// ============================================================
+// INIT
+// ============================================================
+window.addEventListener('DOMContentLoaded', function() {
+  const saved = localStorage.getItem('lc_attempts');
+  if (saved) state.attempts = JSON.parse(saved);
+  if (localStorage.getItem('lc_first_visit') === 'no') state.firstVisit = false;
+  const up = localStorage.getItem('lc_used_prompts');
+  if (up) state.usedPrompts = JSON.parse(up);
+  state.turboData = JSON.parse(localStorage.getItem('lc_turbo_data') || 'null');
+  state.totalStars = countStars();
+
+  const note = document.getElementById('turbo-note');
+  note.textContent = state.totalStars > 0
+    ? '⭐ ' + state.totalStars + ' Turbo star' + (state.totalStars !== 1 ? 's' : '') + ' — he\'ll know.'
+    : 'Play Turbo first to earn stars.';
+
+  const n = localStorage.getItem('lc_brother_name');
+  const g = localStorage.getItem('lc_brother_grade');
+  if (n) document.getElementById('inp-name').value = n;
+  if (g) document.querySelectorAll('.grade-btn').forEach(b => {
+    if (b.dataset.grade === g) { b.classList.add('selected'); state.grade = g; }
+  });
+});
+
+function countStars() {
+  let t = 0;
+  TYPE_KEYS.forEach(cat => {
+    for (let lv = 1; lv <= 10; lv++) {
+      const s = localStorage.getItem('lc_turbo_best_' + cat + '_' + lv);
+      if (s) t += parseInt(s) || 0;
+    }
+  });
+  return t;
+}
+
+// ============================================================
+// WELCOME
+// ============================================================
+function selectGrade(btn) {
+  document.querySelectorAll('.grade-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  state.grade = btn.dataset.grade;
+}
+
+function enterBrother() {
+  const name = document.getElementById('inp-name').value.trim();
+  if (!name) { document.getElementById('inp-name').focus(); return; }
+  if (!state.grade) { alert('Pick your target grade first.'); return; }
+  state.name = name;
+  state.totalStars = countStars();
+  localStorage.setItem('lc_brother_name', name);
+  localStorage.setItem('lc_brother_grade', state.grade);
+  showReveal();
+}
+
+// ============================================================
+// REVEAL
+// ============================================================
+function showReveal() {
+  const name = state.name, grade = state.grade, stars = state.totalStars;
+  const msgs = {
+    H1: [name + '. H1. Right.', 'That\'s not a target. That\'s a statement.\nEvery word you write has to justify it.'],
+    H2: ['Ah. ' + name + '.', 'H2 is absolutely within reach.\nBut there\'s a gap between nearly there and actually there.\nWe\'re going to close it.'],
+    H3: [name + '. Good. Sit down.', grade + ' — solid honest target.\nWe\'re going to build a Section C that gets you there.\nNot by accident. By knowing exactly what to do.'],
+    H4: [name + '. Right.', 'H4 — realistic and achievable.\nMost H4 answers fall down on tense control and vocabulary range.\nWe\'re going to sort both.'],
+    O1: ['Good man. ' + name + '.', 'O1 is absolutely on.\nClarity and accuracy — that\'s what OL rewards.\nLet\'s nail your structures.'],
+    O2: [name + '. Sit down.', 'O2 — very doable.\nFive or six solid structures, used correctly.\nThat\'s what we\'re building.'],
+    O3: [name + '. You\'re here.', 'That\'s enough.\nWherever you are, we start from here.\nNo judgment. Just the work.'],
+  };
+  const m = msgs[grade] || msgs['H3'];
+  document.getElementById('reveal-text').textContent = m[0];
+  document.getElementById('reveal-sub').textContent = m[1] + (stars > 0 ? '\n\nI see ' + stars + ' Turbo star' + (stars !== 1 ? 's' : '') + '. I know what you\'ve been practising.' : '');
+  showScreen('screen-reveal');
+}
+
+function goToCoach() {
+  document.getElementById('header-grade').textContent = 'Section C · Target: ' + state.grade;
+  showScreen('screen-coach');
+  document.getElementById('coach-body').innerHTML = '';
+  openingGreeting();
+}
+
+// ============================================================
+// OPENING
+// ============================================================
+function getWeakestType() {
+  if (!state.turboData) return TYPE_KEYS[Math.floor(Math.random() * TYPE_KEYS.length)];
+  let weakest = 'dialogue', low = Infinity;
+  TYPE_KEYS.forEach(cat => {
+    const d = state.turboData[cat];
+    const stars = d ? Object.values(d.levels || {}).reduce((a, b) => a + b, 0) : 0;
+    if (stars < low) { low = stars; weakest = cat; }
+  });
+  return weakest;
+}
+
+function openingGreeting() {
+  const type = getWeakestType();
+  let msg = '';
+
+  if (state.firstVisit) {
+    msg = 'Right, ' + state.name + '. Here\'s how this works.\n\nI give you a real Section C exam question — same format as the actual paper, bullet points and all. You write your answer in Spanish. I mark it.\n\nFour categories: Content, Accuracy, Range, and Communication — each out of 10, total out of 40. Hit the ? button any time to see exactly what each one means.\n\nBased on your Turbo work, I\'m starting you on ' + TYPE_LABELS[type] + '. That\'s where the work is needed. Here\'s your first question.';
+    localStorage.setItem('lc_first_visit', 'no');
+    state.firstVisit = false;
+  } else if (state.attempts.length > 0) {
+    const last = state.attempts[state.attempts.length - 1];
+    const best = Math.max(...state.attempts.map(a => a.total));
+    const trend = state.attempts.length > 1
+      ? (last.total - state.attempts[state.attempts.length - 2].total)
+      : 0;
+    const trendMsg = trend > 0 ? 'Up ' + trend + ' from last time.' : trend < 0 ? 'Down ' + Math.abs(trend) + ' from last time — let\'s fix that.' : 'Same as last time. Let\'s push it.';
+    msg = state.name + '. ' + trendMsg + ' Best so far: ' + best + '/40. ' + state.attempts.length + ' attempt' + (state.attempts.length !== 1 ? 's' : '') + ' done.\n\n' + TYPE_LABELS[type] + ' today. Let\'s go.';
+  } else {
+    msg = state.name + '. Good. ' + TYPE_LABELS[type] + ' — let\'s get straight into it.';
+  }
+
+  addBMsg(msg);
+  setTimeout(() => givePrompt(type), 500);
+}
+
+// ============================================================
+// PROMPT
+// ============================================================
+function getNextPrompt(type) {
+  const pool = PROMPTS[type];
+  if (!state.usedPrompts[type]) state.usedPrompts[type] = [];
+  if (state.usedPrompts[type].length >= pool.length) state.usedPrompts[type] = [];
+  const available = pool.map((_, i) => i).filter(i => !state.usedPrompts[type].includes(i));
+  const idx = available[Math.floor(Math.random() * available.length)];
+  state.usedPrompts[type].push(idx);
+  localStorage.setItem('lc_used_prompts', JSON.stringify(state.usedPrompts));
+  return pool[idx];
+}
+
+function givePrompt(type) {
+  const prompt = getNextPrompt(type);
+  state.currentPrompt = prompt;
+  state.currentType = type;
+
+  const body = document.getElementById('coach-body');
+
+  const card = document.createElement('div');
+  card.className = 'prompt-card';
+  card.innerHTML = '<div class="prompt-label">' + TYPE_LABELS[type] + '</div>' +
+    '<div class="prompt-title">' + escHtml(prompt.title) + '</div>' +
+    '<ul class="prompt-bullets">' +
+    prompt.bullets.map(b => '<li>' + escHtml(b) + '</li>').join('') +
+    '</ul>';
+  body.appendChild(card);
+
+  const zone = document.createElement('div');
+  zone.className = 'write-zone';
+  zone.id = 'write-zone';
+  zone.innerHTML = '<div class="write-label"><span>Your answer in Spanish</span><span class="word-count" id="wc">0 words</span></div>' +
+    '<textarea class="write-ta" id="write-ta" placeholder="Escribe aquí en español..." oninput="updateWC()"></textarea>' +
+    '<div class="write-footer"><button class="submit-btn" type="button" id="sub-btn" onclick="submitWriting()">Submit for marking →</button></div>';
+  body.appendChild(zone);
+  scrollBottom();
+
+  clearTimeout(state.nudgeT1);
+  clearTimeout(state.nudgeT2);
+  state.nudgeT1 = setTimeout(() => {
+    if (document.getElementById('write-zone'))
+      addNudge('Still at it? Good. But don\'t overthink it — submit what you have and we\'ll see where you are.');
+  }, 4 * 60 * 1000);
+  state.nudgeT2 = setTimeout(() => {
+    if (document.getElementById('write-zone'))
+      addNudge('Right, ' + state.name + '. Come on now. The exam won\'t wait. Submit what you have — even an imperfect answer teaches us something.');
+  }, 8 * 60 * 1000);
+}
+
+function updateWC() {
+  const t = document.getElementById('write-ta').value.trim();
+  const w = t ? t.split(/\s+/).length : 0;
+  document.getElementById('wc').textContent = w + ' word' + (w !== 1 ? 's' : '');
+}
+
+function addNudge(msg) {
+  const el = document.createElement('div');
+  el.className = 'nudge';
+  el.innerHTML = '⏱ ' + escHtml(msg);
+  document.getElementById('coach-body').appendChild(el);
+  scrollBottom();
+}
+
+// ============================================================
+// SUBMIT & MARK
+// ============================================================
+async function submitWriting() {
+  const text = document.getElementById('write-ta').value.trim();
+  if (!text || text.split(/\s+/).length < 5) {
+    addNudge('Write a bit more first — even a few sentences gives me something to mark.');
+    return;
+  }
+
+  clearTimeout(state.nudgeT1); clearTimeout(state.nudgeT2);
+  document.getElementById('write-ta').disabled = true;
+  document.getElementById('sub-btn').disabled = true;
+
+  const typing = addTyping();
+
+  try {
+    const res = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        mode: 'lc_mark',
+        name: state.name, grade: state.grade,
+        section_type: state.currentType,
+        prompt_title: state.currentPrompt.title,
+        prompt_bullets: state.currentPrompt.bullets,
+        writing: text,
+        turbo_summary: buildTurboSummary(),
+        attempt_number: state.attempts.length + 1,
+      })
+    });
+    const data = await res.json();
+    removeTyping(typing);
+    if (data.mark) showMark(data.mark);
+    else addBMsg('Something went wrong with the marking. Try submitting again.');
+  } catch(e) {
+    removeTyping(typing);
+    addBMsg('Lost the connection. Check your signal and try again.');
+  }
+}
+
+function showMark(mark) {
+  const body = document.getElementById('coach-body');
+
+  state.attempts.push({
+    type: state.currentType,
+    typeLabel: TYPE_LABELS[state.currentType],
+    content: mark.content, accuracy: mark.accuracy,
+    range: mark.range, communication: mark.communication,
+    total: mark.total, feedback: mark.feedback,
+    prescription: mark.prescription,
+    date: new Date().toLocaleDateString('en-IE'),
+  });
+  localStorage.setItem('lc_attempts', JSON.stringify(state.attempts.slice(-20)));
+
+  const totalColor = mark.total >= 32 ? '#1a5c38' : mark.total >= 24 ? '#b45309' : '#c0392b';
+
+  const card = document.createElement('div');
+  card.className = 'mark-card';
+  card.innerHTML =
+    '<div class="mark-label">Your marks</div>' +
+    '<div class="mark-grid">' +
+      '<div class="mark-item"><div class="mark-item-label">Content</div><div class="mark-item-val">' + mark.content + '<span>/10</span></div></div>' +
+      '<div class="mark-item"><div class="mark-item-label">Accuracy</div><div class="mark-item-val">' + mark.accuracy + '<span>/10</span></div></div>' +
+      '<div class="mark-item"><div class="mark-item-label">Range</div><div class="mark-item-val">' + mark.range + '<span>/10</span></div></div>' +
+      '<div class="mark-item"><div class="mark-item-label">Communication</div><div class="mark-item-val">' + mark.communication + '<span>/10</span></div></div>' +
+    '</div>' +
+    '<div class="mark-total" style="background:' + totalColor + '">' +
+      '<div class="mark-total-num">' + mark.total + '<span style="font-size:1rem;opacity:0.7">/40</span></div>' +
+      '<div class="mark-total-sub">' + gradeEq(mark.total, state.grade) + '</div>' +
+    '</div>' +
+    '<div class="mark-feedback">' + formatFeedback(mark.feedback) + '</div>';
+  body.appendChild(card);
+
+  if (mark.prescription) {
+    const presc = document.createElement('div');
+    presc.className = 'prescription';
+    presc.innerHTML = '<div class="presc-label">🎯 Prescription</div>' +
+      '<div class="presc-text">' + escHtml(mark.prescription.message || mark.prescription) + '</div>' +
+      (mark.prescription.category ? '<a class="turbo-link" href="index.html">Go to Turbo →</a>' : '');
+    body.appendChild(presc);
+  }
+
+  const actions = document.createElement('div');
+  actions.className = 'action-row';
+  actions.innerHTML =
+    '<button class="action-btn primary" type="button" onclick="nextAttempt()">Try another question →</button>' +
+    '<button class="action-btn" type="button" onclick="showScreen(\'screen-graph\')">📈 See progress</button>';
+  body.appendChild(actions);
+  scrollBottom();
+}
+
+function gradeEq(total, grade) {
+  const ol = grade.startsWith('O');
+  if (total >= 36) return ol ? 'O1 territory' : 'H1 territory';
+  if (total >= 32) return ol ? 'O2 territory' : 'H2 territory';
+  if (total >= 28) return ol ? 'O3 territory' : 'H3 territory';
+  if (total >= 24) return 'H4 territory';
+  if (total >= 20) return 'H5 territory';
+  return 'Keep working';
+}
+
+function nextAttempt() {
+  document.getElementById('coach-body').innerHTML = '';
+  const type = getWeakestType();
+  addBMsg('Right. Next one. ' + TYPE_LABELS[type] + '.');
+  setTimeout(() => givePrompt(type), 400);
+}
+
+// ============================================================
+// GRAPH
+// ============================================================
+function renderGraph() {
+  const attempts = state.attempts;
+  const list = document.getElementById('attempt-list');
+  list.innerHTML = '';
+
+  if (!attempts.length) {
+    list.innerHTML = '<p style="color:var(--muted);font-size:0.88rem;text-align:center;padding:20px">No attempts yet — go write something.</p>';
+    return;
+  }
+
+  const canvas = document.getElementById('progress-chart');
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const w = canvas.parentElement.clientWidth - 32 || 300;
+  const h = 200;
+  canvas.width = w * dpr; canvas.height = h * dpr;
+  canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
+  ctx.scale(dpr, dpr);
+
+  const pad = { t: 16, r: 16, b: 28, l: 28 };
+  const cw = w - pad.l - pad.r, ch = h - pad.t - pad.b;
+  const n = attempts.length;
+
+  ctx.clearRect(0, 0, w, h);
+
+  // Grid
+  [0, 10, 20, 30, 40].forEach(v => {
+    const y = pad.t + ch - (v / 40) * ch;
+    ctx.strokeStyle = '#eee'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(pad.l + cw, y); ctx.stroke();
+    ctx.fillStyle = '#bbb'; ctx.font = '9px Nunito,sans-serif'; ctx.textAlign = 'right';
+    ctx.fillText(v, pad.l - 4, y + 3);
+  });
+
+  const x = i => pad.l + (n === 1 ? cw / 2 : (i / (n - 1)) * cw);
+  const y = v => pad.t + ch - (v / 40) * ch;
+
+  // Component lines (scaled 0-10 → 0-40 axis by ×4)
+  [
+    { key: 'content', color: '#2980b9' },
+    { key: 'accuracy', color: '#c0392b' },
+    { key: 'range', color: '#f39c12' },
+    { key: 'communication', color: '#8e44ad' },
+  ].forEach(({ key, color }) => {
+    ctx.strokeStyle = color; ctx.lineWidth = 1.5; ctx.globalAlpha = 0.45;
+    ctx.beginPath();
+    attempts.forEach((a, i) => {
+      const py = y(a[key] * 4);
+      i === 0 ? ctx.moveTo(x(i), py) : ctx.lineTo(x(i), py);
+    });
+    ctx.stroke(); ctx.globalAlpha = 1;
+  });
+
+  // Total line
+  ctx.strokeStyle = '#1a5c38'; ctx.lineWidth = 3; ctx.lineJoin = 'round';
+  ctx.beginPath();
+  attempts.forEach((a, i) => i === 0 ? ctx.moveTo(x(i), y(a.total)) : ctx.lineTo(x(i), y(a.total)));
+  ctx.stroke();
+
+  // Dots + labels
+  attempts.forEach((a, i) => {
+    const px = x(i), py = y(a.total);
+    ctx.fillStyle = '#1a5c38'; ctx.beginPath(); ctx.arc(px, py, 5, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = 'white'; ctx.beginPath(); ctx.arc(px, py, 2.5, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#1a5c38'; ctx.font = 'bold 10px Nunito,sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText(a.total, px, py - 9);
+    ctx.fillStyle = '#bbb'; ctx.font = '9px Nunito,sans-serif';
+    ctx.fillText('#' + (i + 1), px, h - 6);
+  });
+
+  // Attempt list
+  [...attempts].reverse().forEach((a, i) => {
+    const num = attempts.length - i;
+    const row = document.createElement('div');
+    row.className = 'attempt-row';
+    row.innerHTML =
+      '<div class="att-num">#' + num + '</div>' +
+      '<div class="att-type"><div style="font-weight:700;font-size:0.8rem">' + a.typeLabel + '</div>' +
+      '<div style="font-size:0.7rem;color:var(--muted)">' + a.date + ' · C:' + a.content + ' A:' + a.accuracy + ' R:' + a.range + ' Co:' + a.communication + '</div></div>' +
+      '<div class="att-total">' + a.total + '<span style="font-size:0.68rem;color:var(--muted)">/40</span></div>';
+    list.appendChild(row);
+  });
+}
+
+// ============================================================
+// TYPING
+// ============================================================
+function addTyping() {
+  const body = document.getElementById('coach-body');
+  const w = document.createElement('div');
+  w.className = 'b-msg'; w.id = 'typing-el';
+  const av = document.createElement('div'); av.className = 'b-av'; av.textContent = '🧓';
+  const bub = document.createElement('div'); bub.className = 'typing-ind';
+  bub.innerHTML = '<div class="t-dot"></div><div class="t-dot"></div><div class="t-dot"></div>';
+  w.appendChild(av); w.appendChild(bub); body.appendChild(w);
+  scrollBottom(); return w;
+}
+function removeTyping(el) { if (el && el.parentNode) el.parentNode.removeChild(el); }
+
+function addBMsg(text) {
+  const body = document.getElementById('coach-body');
+  const w = document.createElement('div'); w.className = 'b-msg';
+  const av = document.createElement('div'); av.className = 'b-av'; av.textContent = '🧓';
+  const bub = document.createElement('div'); bub.className = 'b-bub';
+  bub.innerHTML = '<p>' + escHtml(text).replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br>') + '</p>';
+  w.appendChild(av); w.appendChild(bub); body.appendChild(w);
+  scrollBottom();
+}
+
+// ============================================================
+// UTILS
+// ============================================================
+function buildTurboSummary() {
+  if (!state.turboData) return 'No Turbo data.';
+  return TYPE_KEYS.map(cat => {
+    const d = state.turboData[cat];
+    if (!d) return cat + ': not attempted';
+    const stars = Object.values(d.levels || {}).reduce((a, b) => a + b, 0);
+    const max = Math.max(...Object.keys(d.levels || {'0':0}).map(Number));
+    return (d.label || cat) + ': ' + stars + ' stars, level ' + max;
+  }).join(' | ');
+}
+
+function formatFeedback(text) {
+  if (!text) return '';
+  return '<p>' + escHtml(text).replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br>') + '</p>';
+}
+
+function openCriteria() { document.getElementById('criteria-overlay').classList.add('open'); }
+function closeCriteria() { document.getElementById('criteria-overlay').classList.remove('open'); }
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (id === 'screen-graph') renderGraph();
+}
+
+function scrollBottom() {
+  const b = document.getElementById('coach-body');
+  if (b) setTimeout(() => { b.scrollTop = b.scrollHeight; }, 60);
+}
+
+function escHtml(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+}
+</script>
+</body>
+</html>
