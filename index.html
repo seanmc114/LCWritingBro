@@ -495,9 +495,13 @@ function startGame(level) {
         <strong>${phrase.en}</strong>
         <button class="speak-prompt" onclick="speakPrompt('${phrase.en.replace(/'/g,"\\'")}')" title="Read aloud">🔊</button>
       </div>
-      <input type="text" data-answer="${phrase.tl.replace(/"/g,'&quot;')}" placeholder="Escribe en español..." autocomplete="off" autocorrect="off">
+      <input type="text" data-answer="${phrase.tl.replace(/"/g,'&quot;')}" placeholder="Escribe en español..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
       <button class="voice-btn-inline" data-idx="${idx}" onclick="startVoice(this, ${idx})">🎤 Speak</button>
     `;
+    // Disable paste — no gaming the feedback
+    var inp = div.querySelector('input');
+    inp.addEventListener('paste', function(e) { e.preventDefault(); });
+    inp.addEventListener('drop', function(e) { e.preventDefault(); });
     questionsContainer.appendChild(div);
   });
 
@@ -530,13 +534,37 @@ document.getElementById('submit').addEventListener('click', function() {
   var correct = 0;
   var total = currentPhrases.length;
 
+  // First pass: check all answers with strict matching (for 3 stars)
+  var strictCorrect = 0;
+  var lenientCorrect = 0;
+
   document.querySelectorAll('#questions input').forEach(function(input) {
     var userAns    = input.value.trim();
     var correctAns = input.dataset.answer;
-    if (normalise(userAns) === normalise(correctAns)) {
-      correct++;
+    var strict  = normaliseStrict(userAns) === normaliseStrict(correctAns);
+    var lenient = normaliseLenient(userAns) === normaliseLenient(correctAns);
+    input._strict  = strict;
+    input._lenient = lenient;
+    if (lenient) lenientCorrect++;
+    if (strict)  strictCorrect++;
+  });
+
+  // Determine star level first so we know which standard to apply for border colours
+  var totalTimeFull = elapsed; // no penalty yet — calculate below
+
+  // For scoring: use lenient correct for 1/2 stars, strict for 3
+  var tentativeStars = 0;
+  if (strictCorrect === total) tentativeStars = 3;      // all strict — could be 2 or 3
+  else if (lenientCorrect === total) tentativeStars = 2; // all lenient, not all strict
+  else if (lenientCorrect >= Math.ceil(total * 0.5)) tentativeStars = 1;
+  else tentativeStars = 0;
+
+  // Now apply borders and penalties based on lenient correctness
+  document.querySelectorAll('#questions input').forEach(function(input) {
+    if (input._lenient) {
       input.style.border = '2px solid #27ae60';
       input.style.background = '#f0fff4';
+      correct++;
     } else {
       penalty += PENALTY_SECS;
       input.style.border = '2px solid #e74c3c';
@@ -546,10 +574,11 @@ document.getElementById('submit').addEventListener('click', function() {
 
   var totalTime = elapsed + penalty;
 
+  // Final star calculation: 3 stars needs strict + fast, otherwise use lenient
   var stars = 0;
-  if (correct === total && totalTime <= levelUnlockTime(currentLevel)) stars = 3;
-  else if (correct === total) stars = 2;
-  else if (correct >= Math.ceil(total * 0.5)) stars = 1;
+  if (strictCorrect === total && totalTime <= levelUnlockTime(currentLevel)) stars = 3;
+  else if (lenientCorrect === total) stars = 2;
+  else if (lenientCorrect >= Math.ceil(total * 0.5)) stars = 1;
 
   setBest(currentCat, currentLevel, stars);
   if (stars >= 1) setUnlocked(currentLevel + 1);
@@ -558,13 +587,21 @@ document.getElementById('submit').addEventListener('click', function() {
   resultsContainer.innerHTML = '<h3>Finished!</h3>'
     + '<p>Correct: ' + correct + '/' + total + '</p>'
     + '<p>Time: ' + elapsed + 's + Penalty: ' + penalty + 's = <strong>' + totalTime + 's</strong></p>'
-    + '<p style="font-size:1.4rem">' + '⭐'.repeat(stars) + '☆'.repeat(3-stars) + '</p>'
-    + '<h4>What you missed:</h4>';
+    + '<p style="font-size:1.4rem">' + '⭐'.repeat(stars) + '☆'.repeat(3-stars) + '</p>';
+
+  if (stars < 3 && strictCorrect < total && lenientCorrect === total) {
+    var accNote = document.createElement('p');
+    accNote.style.cssText = 'font-size:0.82rem;color:#b45309;margin:4px 0 8px;';
+    accNote.textContent = '💡 For 3 stars: include accents (á é í ó ú ñ) and exact punctuation.';
+    resultsContainer.appendChild(accNote);
+  }
+
+  resultsContainer.innerHTML += '<h4>What you missed:</h4>';
 
   document.querySelectorAll('#questions input').forEach(function(input) {
     var userAns    = input.value.trim();
     var correctAns = input.dataset.answer;
-    if (normalise(userAns) !== normalise(correctAns)) {
+    if (!input._lenient) {
       var p = document.createElement('p');
       p.style.cssText = 'margin:6px 0; font-size:0.92rem;';
       var engLabel = input.closest('div').querySelector('strong').textContent;
@@ -619,15 +656,30 @@ function levelUnlockTime(level) {
   return 130 - (level - 1) * 8;
 }
 
-function normalise(s) {
+// Lenient: no accents, no ¿¡, no commas, case-insensitive — for 1 and 2 stars
+function normaliseLenient(s) {
   return String(s).toLowerCase()
     .replace(/\.\.\./g,'')
+    .replace(/[¿¡]/g,'')
+    .replace(/[,]/g,'')
     .replace(/[áàâä]/g,'a').replace(/[éèêë]/g,'e')
     .replace(/[íîï]/g,'i').replace(/[óôö]/g,'o')
-    .replace(/[úûü]/g,'u').replace(/[ç]/g,'c')
-    .replace(/[ñ]/g,'n').replace(/[¿¡]/g,'')
+    .replace(/[úûü]/g,'u').replace(/[ü]/g,'u')
+    .replace(/[ñ]/g,'n')
     .replace(/\s+/g,' ').trim();
 }
+
+// Strict: accents required, ¿¡ stripped (still can't type them), commas stripped, case-insensitive — for 3 stars
+function normaliseStrict(s) {
+  return String(s).toLowerCase()
+    .replace(/\.\.\./g,'')
+    .replace(/[¿¡]/g,'')
+    .replace(/[,]/g,'')
+    .replace(/\s+/g,' ').trim();
+}
+
+// Keep old normalise as alias for lenient (used nowhere else now)
+function normalise(s) { return normaliseLenient(s); }
 
 // ============================================================
 // VOICE — read aloud + speech input

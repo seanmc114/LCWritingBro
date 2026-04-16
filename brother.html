@@ -639,7 +639,7 @@
 
     <button class="enter-btn" id="enter-btn" onclick="enterBrother()">Enter →</button>
 
-    <p class="turbo-stars-note" id="turbo-stars-note">Checking your Turbo stars...</p>
+    <p class="turbo-stars-note" id="turbo-stars-note">Loading your Turbo stars...</p>
 
     <footer>© 2026 Synge Street Games: Imagination and Perseverance</footer>
   </div>
@@ -778,7 +778,7 @@ window.addEventListener('DOMContentLoaded', function() {
   var raw = localStorage.getItem('lc_turbo_data');
   state.turboData = raw ? JSON.parse(raw) : null;
 
-  // Also count stars directly
+  // Count stars directly from localStorage
   var total = 0;
   ['dialogue','diary','note','opinion','formal'].forEach(function(cat) {
     for (var lv = 1; lv <= 10; lv++) {
@@ -789,13 +789,17 @@ window.addEventListener('DOMContentLoaded', function() {
   state.totalStars = total;
 
   var note = document.getElementById('turbo-stars-note');
-  if (total > 0) {
-    note.textContent = '⭐ ' + total + ' Turbo star' + (total !== 1 ? 's' : '') + ' earned — he\'ll know.';
+  var btn  = document.getElementById('enter-btn');
+  if (total >= 5) {
+    note.textContent = '⭐ ' + total + ' Turbo star' + (total !== 1 ? 's' : '') + ' — he\'ll know.';
+    note.style.color = 'rgba(255,255,255,0.45)';
   } else {
-    note.textContent = 'No Turbo stars yet — go earn some first if you can.';
+    note.textContent = '⚠️ You need 5 Turbo stars to enter. You have ' + total + '. Go earn them first.';
+    note.style.color = '#e67e22';
+    note.style.fontStyle = 'normal';
   }
 
-  // Restore saved state
+  // Restore saved name/grade
   var savedName = localStorage.getItem('lc_brother_name');
   var savedGrade = localStorage.getItem('lc_brother_grade');
   if (savedName) document.getElementById('inp-name').value = savedName;
@@ -822,6 +826,16 @@ function enterBrother() {
   var name = document.getElementById('inp-name').value.trim();
   if (!name) { document.getElementById('inp-name').focus(); return; }
   if (!state.grade) { alert('Pick your target grade first.'); return; }
+
+  // Gate check
+  if (state.totalStars < 5) {
+    var note = document.getElementById('turbo-stars-note');
+    note.textContent = '⚠️ You need 5 stars from Turbo first. You have ' + state.totalStars + '.';
+    note.style.color = '#c0392b';
+    note.style.fontStyle = 'normal';
+    note.style.fontWeight = 'bold';
+    return;
+  }
 
   state.name = name;
   localStorage.setItem('lc_brother_name', name);
