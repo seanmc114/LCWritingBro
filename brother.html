@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>The Brother — LC Spanish</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Nunito:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #1c1917;
+      --paper: #faf7f2;
+      --aged: #f0ead6;
+      --brother: #1a5c38;
+      --brother-light: #e8f5ee;
+      --gold: #b45309;
+      --teal: #0f766e;
+      --coral: #be123c;
+      --muted: #78716c;
+      --border: #d6d3c4;
+      --red: #c0392b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--paper);
+      min-height: 100vh;
+      color: var(--ink);
+    }
+
+    .screen { display: none; min-height: 100vh; }
+    .screen.active { display: flex; flex-direction: column; }
+
+    /* ============================================================
+       WELCOME SCREEN
+    ============================================================ */
+    #screen-welcome {
+      justify-content: center;
+      align-items: center;
+      background: var(--ink);
+      padding: 30px 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    #screen-welcome::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 30% 40%, rgba(26,92,56,0.25) 0%, transparent 60%),
+                  radial-gradient(ellipse at 80% 80%, rgba(192,57,43,0.1) 0%, transparent 50%);
+    }
+    .welcome-inner {
+      position: relative;
+      z-index: 1;
+      max-width: 480px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .brother-figure {
+      font-size: 6rem;
+      margin-bottom: 16px;
+      animation: brotherBob 4s ease-in-out infinite;
+      display: block;
+      filter: drop-shadow(0 0 20px rgba(26,92,56,0.4));
+    }
+    @keyframes brotherBob {
+      0%,100% { transform: translateY(0) rotate(-2deg); }
+      50% { transform: translateY(-12px) rotate(2deg); }
+    }
+
+    .welcome-title {
+      font-family: 'Lora', serif;
+      font-size: 2.6rem;
+      font-weight: 600;
+      color: white;
+      margin-bottom: 4px;
+      letter-spacing: -1px;
+    }
+    .welcome-sub {
+      color: rgba(255,255,255,0.4);
+      font-size: 0.82rem;
+      margin-bottom: 32px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .welcome-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px;
+      padding: 26px 22px;
+      margin-bottom: 16px;
+      backdrop-filter: blur(10px);
+    }
+
+    .field-label {
+      color: rgba(255,255,255,0.5);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 8px;
+      display: block;
+      text-align: left;
+    }
+
+    .field-input {
+      width: 100%;
+      background: rgba(255,255,255,0.08);
+      border: 2px solid rgba(255,255,255,0.12);
+      border-radius: 10px;
+      color: white;
+      font-family: 'Nunito', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      padding: 11px 14px;
+      outline: none;
+      transition: border-color 0.2s;
+      margin-bottom: 18px;
+    }
+    .field-input:focus { border-color: var(--brother); }
+    .field-input::placeholder { color: rgba(255,255,255,0.2); }
+
+    /* Grade picker */
+    .grade-row {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 4px;
+    }
+    .grade-btn {
+      flex: 1;
+      min-width: 54px;
+      background: rgba(255,255,255,0.05);
+      border: 2px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      color: rgba(255,255,255,0.5);
+      font-family: 'Nunito', sans-serif;
+      font-weight: 700;
+      font-size: 0.82rem;
+      padding: 9px 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+    .grade-btn:hover { border-color: rgba(26,92,56,0.5); color: white; }
+    .grade-btn.selected { background: var(--brother); border-color: var(--brother); color: white; }
+    .grade-btn.hl { }
+    .grade-btn.ol { background: rgba(180,83,9,0.15); border-color: rgba(180,83,9,0.3); }
+    .grade-btn.ol.selected { background: var(--gold); border-color: var(--gold); }
+
+    .enter-btn {
+      width: 100%;
+      padding: 15px;
+      background: var(--brother);
+      color: white;
+      font-family: 'Nunito', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 900;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 10px;
+    }
+    .enter-btn:hover { filter: brightness(1.15); transform: scale(1.01); }
+    .enter-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+    .turbo-stars-note {
+      color: rgba(255,255,255,0.3);
+      font-size: 0.78rem;
+      margin-top: 14px;
+      font-style: italic;
+    }
+
+    /* ============================================================
+       REVEAL SCREEN
+    ============================================================ */
+    #screen-reveal {
+      justify-content: center;
+      align-items: center;
+      background: var(--ink);
+      padding: 40px 20px;
+    }
+    .reveal-inner {
+      max-width: 460px;
+      width: 100%;
+      text-align: center;
+    }
+    .brother-big {
+      font-size: 7rem;
+      display: block;
+      animation: revealFloat 2s ease-in-out infinite;
+      filter: drop-shadow(0 0 40px rgba(26,92,56,0.8));
+      margin-bottom: 18px;
+    }
+    @keyframes revealFloat {
+      0%,100% { transform: translateY(0); }
+      50% { transform: translateY(-14px); }
+    }
+    .reveal-text {
+      font-family: 'Lora', serif;
+      font-size: 1.55rem;
+      color: white;
+      margin-bottom: 10px;
+      line-height: 1.4;
+    }
+    .reveal-sub {
+      color: rgba(255,255,255,0.45);
+      font-size: 0.95rem;
+      margin-bottom: 32px;
+      line-height: 1.65;
+      white-space: pre-line;
+    }
+    .reveal-btn {
+      background: var(--brother);
+      color: white;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 900;
+      font-size: 1.05rem;
+      padding: 15px 38px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .reveal-btn:hover { filter: brightness(1.15); transform: scale(1.02); }
+
+    /* ============================================================
+       CHAT SCREEN
+    ============================================================ */
+    #screen-chat {
+      background: var(--paper);
+      flex-direction: column;
+      max-width: 720px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .chat-header {
+      background: var(--ink);
+      padding: 13px 18px;
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      flex-shrink: 0;
+    }
+    .chat-header-brother { font-size: 1.7rem; animation: brotherBob 4s ease-in-out infinite; }
+    .chat-header-info { flex: 1; }
+    .chat-header-name {
+      font-family: 'Lora', serif;
+      color: white;
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+    .chat-header-grade {
+      color: rgba(255,255,255,0.4);
+      font-size: 0.72rem;
+    }
+    .chat-header-actions { display: flex; gap: 7px; }
+    .header-btn {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.6);
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 5px 10px;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .header-btn:hover { background: rgba(255,255,255,0.14); color: white; }
+
+    /* Section C type buttons */
+    .section-bar {
+      display: flex;
+      background: rgba(0,0,0,0.5);
+      flex-shrink: 0;
+      overflow-x: auto;
+    }
+    .section-pip {
+      flex: 1;
+      min-width: 80px;
+      padding: 7px 4px;
+      text-align: center;
+      font-size: 0.65rem;
+      color: rgba(255,255,255,0.28);
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .section-pip.active { color: white; background: rgba(26,92,56,0.45); }
+    .section-pip:hover { color: rgba(255,255,255,0.65); }
+
+    /* Messages */
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 18px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .msg {
+      display: flex;
+      gap: 9px;
+      max-width: 88%;
+      animation: msgIn 0.3s ease;
+    }
+    @keyframes msgIn {
+      from { opacity: 0; transform: translateY(7px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .msg.brother { align-self: flex-start; }
+    .msg.user { align-self: flex-end; flex-direction: row-reverse; }
+
+    .msg-avatar {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .msg.brother .msg-avatar { background: var(--brother); }
+    .msg.user .msg-avatar { background: var(--aged); border: 2px solid var(--border); }
+
+    .msg-bubble {
+      padding: 11px 15px;
+      border-radius: 15px;
+      font-size: 0.93rem;
+      line-height: 1.58;
+    }
+    .msg.brother .msg-bubble {
+      background: white;
+      border: 1px solid var(--border);
+      border-top-left-radius: 4px;
+      color: var(--ink);
+      box-shadow: 0 2px 7px rgba(0,0,0,0.06);
+    }
+    .msg.user .msg-bubble {
+      background: var(--brother);
+      color: white;
+      border-top-right-radius: 4px;
+    }
+
+    /* Marking result card */
+    .mark-card {
+      background: var(--brother-light);
+      border-left: 3px solid var(--brother);
+      border-radius: 8px;
+      padding: 11px 14px;
+      margin-top: 10px;
+      font-size: 0.86rem;
+    }
+    .mark-card.weak {
+      background: #fff0f0;
+      border-color: var(--coral);
+    }
+    .mark-row { display: flex; justify-content: space-between; margin-bottom: 4px; }
+    .mark-label { font-weight: 700; color: var(--muted); font-size: 0.75rem; text-transform: uppercase; }
+    .mark-score { font-weight: 900; color: var(--brother); }
+    .mark-score.low { color: var(--coral); }
+
+    /* Projection chip */
+    .projection-chip {
+      display: inline-block;
+      background: var(--aged);
+      border: 2px solid var(--gold);
+      border-radius: 10px;
+      padding: 8px 14px;
+      font-size: 0.85rem;
+      color: var(--gold);
+      font-weight: 700;
+      margin-top: 10px;
+    }
+
+    /* Fact/quote card */
+    .fact-card {
+      background: var(--brother-light);
+      border-left: 3px solid var(--brother);
+      border-radius: 8px;
+      padding: 10px 13px;
+      margin-top: 10px;
+      font-size: 0.86rem;
+    }
+    .fact-tl { color: var(--brother); font-weight: 700; margin-top: 4px; font-style: italic; }
+    .quote-card {
+      background: var(--aged);
+      border-left: 3px solid var(--gold);
+      border-radius: 8px;
+      padding: 10px 13px;
+      margin-top: 10px;
+      font-size: 0.86rem;
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    /* Typing indicator */
+    .typing-indicator {
+      display: flex; align-items: center; gap: 5px;
+      padding: 11px 15px;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      border-top-left-radius: 4px;
+      width: fit-content;
+    }
+    .typing-dot {
+      width: 7px; height: 7px;
+      background: var(--muted);
+      border-radius: 50%;
+      animation: typingBounce 1.2s ease infinite;
+    }
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes typingBounce {
+      0%,60%,100% { transform: translateY(0); }
+      30% { transform: translateY(-6px); }
+    }
+
+    /* Input area */
+    .chat-input-area {
+      padding: 13px 14px;
+      background: white;
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .input-row { display: flex; gap: 7px; align-items: flex-end; }
+    .chat-input {
+      flex: 1;
+      background: var(--aged);
+      border: 2px solid var(--border);
+      border-radius: 11px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.93rem;
+      padding: 11px 13px;
+      outline: none;
+      resize: none;
+      min-height: 44px;
+      max-height: 120px;
+      transition: border-color 0.2s;
+      color: var(--ink);
+    }
+    .chat-input:focus { border-color: var(--brother); }
+    .chat-input::placeholder { color: var(--muted); }
+
+    .send-btn {
+      background: var(--brother);
+      color: white;
+      border: none;
+      border-radius: 11px;
+      width: 44px; height: 44px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .send-btn:hover { filter: brightness(1.15); }
+    .send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .voice-btn {
+      background: var(--aged);
+      border: 2px solid var(--border);
+      border-radius: 11px;
+      width: 44px; height: 44px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .voice-btn.listening { background: #fee; border-color: var(--coral); }
+
+    .input-hints {
+      display: flex; flex-wrap: wrap; gap: 5px;
+      margin-top: 8px;
+    }
+    .hint-chip {
+      background: var(--aged);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 5px 11px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .hint-chip:hover { background: var(--brother); color: white; border-color: var(--brother); }
+
+    /* Write zone */
+    .write-zone {
+      background: var(--aged);
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-top: 10px;
+    }
+    .write-zone textarea {
+      width: 100%;
+      background: none;
+      border: none;
+      font-family: 'Lora', serif;
+      font-size: 0.92rem;
+      color: var(--ink);
+      resize: vertical;
+      min-height: 90px;
+      outline: none;
+      line-height: 1.6;
+    }
+    .write-zone textarea::placeholder { color: var(--muted); font-style: italic; }
+    .write-zone-footer { display: flex; gap: 8px; margin-top: 8px; justify-content: flex-end; }
+    .mark-btn {
+      background: var(--red);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 7px 16px;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 700;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .mark-btn:hover { filter: brightness(1.1); }
+
+    /* Spinner */
+    .spinner {
+      display: inline-block;
+      width: 17px; height: 17px;
+      border: 2px solid rgba(26,92,56,0.2);
+      border-top-color: var(--brother);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loading-msg {
+      text-align: center;
+      color: var(--muted);
+      font-style: italic;
+      font-size: 0.88rem;
+      padding: 18px;
+    }
+    .hidden { display: none !important; }
+
+    footer {
+      text-align: center;
+      font-size: 0.68rem;
+      color: rgba(255,255,255,0.2);
+      padding: 14px;
+      flex-shrink: 0;
+    }
+    footer.light { color: var(--muted); }
+  </style>
+</head>
+<body>
+
+<!-- ============================================================
+     SCREEN 1: WELCOME
+============================================================ -->
+<div id="screen-welcome" class="screen active">
+  <div class="welcome-inner">
+    <!-- The Brother SVG — same as CBA version -->
+    <svg class="brother-figure" viewBox="0 0 200 260" width="140" height="182" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="100" cy="190" rx="58" ry="72" fill="#2d5a27"/>
+      <rect x="42" y="155" width="116" height="100" rx="20" fill="#2d5a27"/>
+      <rect x="84" y="155" width="32" height="90" rx="4" fill="#f0ead6"/>
+      <path d="M42 165 Q55 155 72 152 L84 155 L84 245 Q62 240 42 220Z" fill="#3d7a35"/>
+      <path d="M158 165 Q145 155 128 152 L116 155 L116 245 Q138 240 158 220Z" fill="#3d7a35"/>
+      <ellipse cx="28" cy="195" rx="20" ry="52" fill="#2d5a27"/>
+      <ellipse cx="172" cy="195" rx="20" ry="52" fill="#2d5a27"/>
+      <ellipse cx="28" cy="238" rx="16" ry="14" fill="#d4956a"/>
+      <ellipse cx="172" cy="238" rx="16" ry="14" fill="#d4956a"/>
+      <rect x="86" y="128" width="28" height="32" rx="8" fill="#d4956a"/>
+      <ellipse cx="100" cy="100" rx="54" ry="60" fill="#d4956a"/>
+      <ellipse cx="100" cy="52" rx="52" ry="28" fill="#e8e2d0"/>
+      <path d="M48 72 Q44 55 50 42 Q58 28 72 24 Q86 20 100 20 Q114 20 128 24 Q142 28 150 42 Q156 55 152 72" fill="#e8e2d0"/>
+      <path d="M52 78 Q50 62 56 48 Q66 32 100 28 Q134 32 144 48 Q150 62 148 78" fill="#c8bfaa" opacity="0.5"/>
+      <path d="M48 85 Q42 95 44 108" fill="none" stroke="#e8e2d0" stroke-width="10" stroke-linecap="round"/>
+      <path d="M152 85 Q158 95 156 108" fill="none" stroke="#e8e2d0" stroke-width="10" stroke-linecap="round"/>
+      <ellipse cx="100" cy="80" rx="44" ry="22" fill="#d4956a"/>
+      <ellipse cx="72" cy="112" rx="12" ry="8" fill="#e8906a" opacity="0.35"/>
+      <ellipse cx="128" cy="112" rx="12" ry="8" fill="#e8906a" opacity="0.35"/>
+      <path d="M68 90 Q82 84 96 90" fill="none" stroke="#a09080" stroke-width="4" stroke-linecap="round"/>
+      <path d="M104 90 Q118 84 132 90" fill="none" stroke="#a09080" stroke-width="4" stroke-linecap="round"/>
+      <ellipse cx="82" cy="102" rx="13" ry="10" fill="#f0ede6"/>
+      <ellipse cx="118" cy="102" rx="13" ry="10" fill="#f0ede6"/>
+      <ellipse cx="82" cy="103" rx="7" ry="8" fill="#5a3e28"/>
+      <ellipse cx="118" cy="103" rx="7" ry="8" fill="#5a3e28"/>
+      <ellipse cx="82" cy="103" rx="4" ry="4.5" fill="#1a1208"/>
+      <ellipse cx="118" cy="103" rx="4" ry="4.5" fill="#1a1208"/>
+      <ellipse cx="84" cy="100" rx="2" ry="2" fill="white"/>
+      <ellipse cx="120" cy="100" rx="2" ry="2" fill="white"/>
+      <ellipse cx="82" cy="103" rx="15" ry="12" fill="rgba(200,220,255,0.12)" stroke="#7a6a5a" stroke-width="2"/>
+      <ellipse cx="118" cy="103" rx="15" ry="12" fill="rgba(200,220,255,0.12)" stroke="#7a6a5a" stroke-width="2"/>
+      <path d="M97 103 Q100 100 103 103" fill="none" stroke="#7a6a5a" stroke-width="2"/>
+      <path d="M67 99 Q60 96 54 98" fill="none" stroke="#7a6a5a" stroke-width="2"/>
+      <path d="M133 99 Q140 96 146 98" fill="none" stroke="#7a6a5a" stroke-width="2"/>
+      <ellipse cx="100" cy="118" rx="9" ry="7" fill="#c08060"/>
+      <ellipse cx="100" cy="115" rx="6" ry="5" fill="#c88a62"/>
+      <path d="M82 132 Q100 144 118 132" fill="none" stroke="#8a5a3a" stroke-width="2.5" stroke-linecap="round"/>
+      <ellipse cx="46" cy="105" rx="9" ry="13" fill="#c08060"/>
+      <ellipse cx="154" cy="105" rx="9" ry="13" fill="#c08060"/>
+    </svg>
+
+    <h1 class="welcome-title">The Brother</h1>
+    <p class="welcome-sub">LC Spanish · Section C · Leaving Cert 2026</p>
+
+    <div class="welcome-card">
+      <label class="field-label">Your first name</label>
+      <input class="field-input" id="inp-name" type="text" placeholder="What do they call you?" maxlength="30" autocomplete="off">
+
+      <label class="field-label">Your target grade</label>
+      <div class="grade-row">
+        <button class="grade-btn hl" data-grade="H1" onclick="selectGrade(this)">H1</button>
+        <button class="grade-btn hl" data-grade="H2" onclick="selectGrade(this)">H2</button>
+        <button class="grade-btn hl" data-grade="H3" onclick="selectGrade(this)">H3</button>
+        <button class="grade-btn hl" data-grade="H4" onclick="selectGrade(this)">H4</button>
+        <button class="grade-btn ol" data-grade="O1" onclick="selectGrade(this)">O1</button>
+        <button class="grade-btn ol" data-grade="O2" onclick="selectGrade(this)">O2</button>
+        <button class="grade-btn ol" data-grade="O3" onclick="selectGrade(this)">O3</button>
+      </div>
+    </div>
+
+    <button class="enter-btn" id="enter-btn" onclick="enterBrother()">Enter →</button>
+
+    <p class="turbo-stars-note" id="turbo-stars-note">Checking your Turbo stars...</p>
+
+    <footer>© 2026 Synge Street Games: Imagination and Perseverance</footer>
+  </div>
+</div>
+
+<!-- ============================================================
+     SCREEN 2: REVEAL
+============================================================ -->
+<div id="screen-reveal" class="screen">
+  <div class="reveal-inner" style="position:relative;z-index:1;">
+    <svg viewBox="0 0 200 260" width="120" height="156" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="100" cy="190" rx="58" ry="72" fill="#2d5a27"/>
+      <rect x="42" y="155" width="116" height="100" rx="20" fill="#2d5a27"/>
+      <rect x="84" y="155" width="32" height="90" rx="4" fill="#f0ead6"/>
+      <path d="M42 165 Q55 155 72 152 L84 155 L84 245 Q62 240 42 220Z" fill="#3d7a35"/>
+      <path d="M158 165 Q145 155 128 152 L116 155 L116 245 Q138 240 158 220Z" fill="#3d7a35"/>
+      <ellipse cx="28" cy="195" rx="20" ry="52" fill="#2d5a27"/>
+      <ellipse cx="172" cy="195" rx="20" ry="52" fill="#2d5a27"/>
+      <ellipse cx="28" cy="238" rx="16" ry="14" fill="#d4956a"/>
+      <ellipse cx="172" cy="238" rx="16" ry="14" fill="#d4956a"/>
+      <rect x="86" y="128" width="28" height="32" rx="8" fill="#d4956a"/>
+      <ellipse cx="100" cy="100" rx="54" ry="60" fill="#d4956a"/>
+      <ellipse cx="100" cy="52" rx="52" ry="28" fill="#e8e2d0"/>
+      <path d="M48 72 Q44 55 50 42 Q58 28 72 24 Q86 20 100 20 Q114 20 128 24 Q142 28 150 42 Q156 55 152 72" fill="#e8e2d0"/>
+      <path d="M48 85 Q42 95 44 108" fill="none" stroke="#e8e2d0" stroke-width="10" stroke-linecap="round"/>
+      <path d="M152 85 Q158 95 156 108" fill="none" stroke="#e8e2d0" stroke-width="10" stroke-linecap="round"/>
+      <ellipse cx="100" cy="80" rx="44" ry="22" fill="#d4956a"/>
+      <path d="M68 90 Q82 84 96 90" fill="none" stroke="#a09080" stroke-width="4" stroke-linecap="round"/>
+      <path d="M104 90 Q118 84 132 90" fill="none" stroke="#a09080" stroke-width="4" stroke-linecap="round"/>
+      <ellipse cx="82" cy="102" rx="13" ry="10" fill="#f0ede6"/>
+      <ellipse cx="118" cy="102" rx="13" ry="10" fill="#f0ede6"/>
+      <ellipse cx="82" cy="103" rx="7" ry="8" fill="#5a3e28"/>
+      <ellipse cx="118" cy="103" rx="7" ry="8" fill="#5a3e28"/>
+      <ellipse cx="82" cy="103" rx="4" ry="4.5" fill="#1a1208"/>
+      <ellipse cx="118" cy="103" rx="4" ry="4.5" fill="#1a1208"/>
+      <ellipse cx="84" cy="100" rx="2" ry="2" fill="white"/>
+      <ellipse cx="120" cy="100" rx="2" ry="2" fill="white"/>
+      <ellipse cx="82" cy="103" rx="15" ry="12" fill="rgba(200,220,255,0.12)" stroke="#7a6a5a" stroke-width="2"/>
+      <ellipse cx="118" cy="103" rx="15" ry="12" fill="rgba(200,220,255,0.12)" stroke="#7a6a5a" stroke-width="2"/>
+      <path d="M97 103 Q100 100 103 103" fill="none" stroke="#7a6a5a" stroke-width="2"/>
+      <ellipse cx="100" cy="118" rx="9" ry="7" fill="#c08060"/>
+      <path d="M84 132 Q100 142 116 132" fill="none" stroke="#8a5a3a" stroke-width="2.5" stroke-linecap="round"/>
+      <ellipse cx="46" cy="105" rx="9" ry="13" fill="#c08060"/>
+      <ellipse cx="154" cy="105" rx="9" ry="13" fill="#c08060"/>
+    </svg>
+    <p class="reveal-text" id="reveal-text">Right. Sit down.</p>
+    <p class="reveal-sub" id="reveal-sub">Let's see what you've got.</p>
+    <button class="reveal-btn" onclick="goToChat()">Let's go →</button>
+    <footer style="margin-top:28px;">© 2026 Synge Street Games: Imagination and Perseverance</footer>
+  </div>
+</div>
+
+<!-- ============================================================
+     SCREEN 3: CHAT
+============================================================ -->
+<div id="screen-chat" class="screen">
+  <div class="chat-header">
+    <span class="chat-header-brother">🧓</span>
+    <div class="chat-header-info">
+      <div class="chat-header-name">The Brother — LC Spanish</div>
+      <div class="chat-header-grade" id="header-grade-label">Section C · Target: —</div>
+    </div>
+    <div class="chat-header-actions">
+      <button class="header-btn" onclick="triggerWrite()">✏️ Write</button>
+      <button class="header-btn" onclick="goHome()">Home</button>
+    </div>
+  </div>
+
+  <div class="section-bar" id="section-bar">
+    <div class="section-pip active" data-type="dialogue" onclick="setSectionType('dialogue',this)">💬 Dialogue</div>
+    <div class="section-pip" data-type="diary" onclick="setSectionType('diary',this)">📔 Diary</div>
+    <div class="section-pip" data-type="note" onclick="setSectionType('note',this)">✉️ Note</div>
+    <div class="section-pip" data-type="opinion" onclick="setSectionType('opinion',this)">🗣️ Opinion</div>
+    <div class="section-pip" data-type="formal" onclick="setSectionType('formal',this)">📋 Formal</div>
+  </div>
+
+  <div class="chat-messages" id="chat-messages"></div>
+
+  <div class="chat-input-area">
+    <div class="input-row">
+      <button class="voice-btn" id="voice-btn" onclick="toggleVoice()" title="Speak">🎤</button>
+      <textarea class="chat-input" id="chat-input" placeholder="Type here or tap the mic..." rows="1"
+        onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+      <button class="send-btn" id="send-btn" onclick="sendMessage()">➤</button>
+    </div>
+    <div class="input-hints" id="input-hints">
+      <button class="hint-chip" onclick="useHint('What should I focus on for Section C?')">What to focus on?</button>
+      <button class="hint-chip" onclick="useHint('How am I doing?')">How am I doing?</button>
+      <button class="hint-chip" onclick="useHint('Give me a mad fact in Spanish')">Mad fact 🤯</button>
+      <button class="hint-chip" onclick="useHint('Send me back to Turbo')">Back to Turbo</button>
+    </div>
+  </div>
+
+  <footer class="light">© 2026 Synge Street Games: Imagination and Perseverance</footer>
+</div>
+
+<script>
+// ============================================================
+// CONFIG
+// ============================================================
+const WORKER_URL = 'https://patient-morning-62fc.seansynge.workers.dev';
+
+// ============================================================
+// STATE
+// ============================================================
+let state = {
+  name: '',
+  grade: 'H3',
+  sectionType: 'dialogue',
+  history: [],
+  turboData: null,
+  totalStars: 0,
+};
+
+const GRADE_LABELS = {
+  H1:'H1 (90%+)', H2:'H2 (80–89%)', H3:'H3 (70–79%)', H4:'H4 (60–69%)',
+  O1:'O1 (90%+)', O2:'O2 (80–89%)', O3:'O3 (70–79%)'
+};
+
+const SECTION_LABELS = {
+  dialogue:'Dialogue', diary:'Diary Entry', note:'Note/Email', opinion:'Opinion Piece', formal:'Formal Letter'
+};
+
+const QUOTES = [
+  { en: "The secret of getting ahead is getting started.", es: "El secreto para avanzar es empezar." },
+  { en: "Every expert was once a beginner.", es: "Todo experto fue alguna vez un principiante." },
+  { en: "Courage is speaking even when your voice shakes.", es: "El valor es hablar aunque te tiemble la voz." },
+  { en: "Small daily improvements lead to stunning results.", es: "Las pequeñas mejoras diarias llevan a resultados extraordinarios." },
+  { en: "It always seems impossible until it's done.", es: "Siempre parece imposible hasta que se hace." },
+];
+
+// ============================================================
+// READ TURBO DATA on load
+// ============================================================
+window.addEventListener('DOMContentLoaded', function() {
+  var raw = localStorage.getItem('lc_turbo_data');
+  state.turboData = raw ? JSON.parse(raw) : null;
+
+  // Also count stars directly
+  var total = 0;
+  ['dialogue','diary','note','opinion','formal'].forEach(function(cat) {
+    for (var lv = 1; lv <= 10; lv++) {
+      var s = localStorage.getItem('lc_turbo_best_'+cat+'_'+lv);
+      if (s) total += parseInt(s);
+    }
+  });
+  state.totalStars = total;
+
+  var note = document.getElementById('turbo-stars-note');
+  if (total > 0) {
+    note.textContent = '⭐ ' + total + ' Turbo star' + (total !== 1 ? 's' : '') + ' earned — he\'ll know.';
+  } else {
+    note.textContent = 'No Turbo stars yet — go earn some first if you can.';
+  }
+
+  // Restore saved state
+  var savedName = localStorage.getItem('lc_brother_name');
+  var savedGrade = localStorage.getItem('lc_brother_grade');
+  if (savedName) document.getElementById('inp-name').value = savedName;
+  if (savedGrade) {
+    document.querySelectorAll('.grade-btn').forEach(function(b) {
+      if (b.dataset.grade === savedGrade) {
+        b.classList.add('selected');
+        state.grade = savedGrade;
+      }
+    });
+  }
+});
+
+// ============================================================
+// WELCOME
+// ============================================================
+function selectGrade(btn) {
+  document.querySelectorAll('.grade-btn').forEach(function(b) { b.classList.remove('selected'); });
+  btn.classList.add('selected');
+  state.grade = btn.dataset.grade;
+}
+
+function enterBrother() {
+  var name = document.getElementById('inp-name').value.trim();
+  if (!name) { document.getElementById('inp-name').focus(); return; }
+  if (!state.grade) { alert('Pick your target grade first.'); return; }
+
+  state.name = name;
+  localStorage.setItem('lc_brother_name', name);
+  localStorage.setItem('lc_brother_grade', state.grade);
+
+  // Restore history
+  var saved = localStorage.getItem('lc_brother_history');
+  state.history = saved ? JSON.parse(saved) : [];
+
+  showReveal();
+}
+
+// ============================================================
+// REVEAL
+// ============================================================
+function showReveal() {
+  var name = state.name;
+  var grade = state.grade;
+  var stars = state.totalStars;
+  var text = document.getElementById('reveal-text');
+  var sub = document.getElementById('reveal-sub');
+
+  var isHL = grade.startsWith('H');
+  var isOL = grade.startsWith('O');
+
+  if (grade === 'H1') {
+    text.textContent = name + '. H1. Right.';
+    sub.textContent = 'That's not a target. That's a statement.\nLet's make sure every word you write justifies it.';
+  } else if (grade === 'H2') {
+    text.textContent = 'Ah. ' + name + '.';
+    sub.textContent = 'H2 is absolutely within reach.\nBut there's a gap between nearly there and actually there.\nLet's close it.';
+  } else if (grade === 'H3' || grade === 'H4') {
+    text.textContent = name + '. Good. Sit down.';
+    sub.textContent = 'Right. ' + grade + ' — solid target.\nWe\'re going to build you a Section C that gets you there.\nNot by accident. By knowing exactly what to do.';
+  } else if (grade === 'O1' || grade === 'O2') {
+    text.textContent = 'Good lad. ' + name + '.';
+    sub.textContent = 'You showed up. That matters.\n' + grade + ' is very doable — I\'ve seen people in worse shape pull it off.\nLet\'s find your minimum viable structures and nail them.';
+  } else {
+    text.textContent = name + '. You\'re here.';
+    sub.textContent = 'That\'s enough for now.\nWherever you are, we start from here.\nNo judgment. Just the work.';
+  }
+
+  if (stars > 0) {
+    sub.textContent += '\n\nI see ' + stars + ' star' + (stars !== 1 ? 's' : '') + ' from Turbo. I already know what you\'ve been working on.';
+  }
+
+  showScreen('screen-reveal');
+}
+
+function goToChat() {
+  document.getElementById('header-grade-label').textContent =
+    'Section C · Target: ' + state.grade;
+  showScreen('screen-chat');
+  if (state.history.length === 0) {
+    openingMessage();
+  } else {
+    renderHistory();
+  }
+}
+
+// ============================================================
+// OPENING MESSAGE — grade-aware, turbo-aware
+// ============================================================
+function openingMessage() {
+  var name = state.name;
+  var grade = state.grade;
+  var stars = state.totalStars;
+  var turbo = state.turboData;
+  var isHL = grade.startsWith('H');
+
+  var turboNote = '';
+  if (turbo) {
+    var strongCats = [];
+    var weakCats = [];
+    Object.keys(turbo).forEach(function(cat) {
+      var levels = turbo[cat].levels;
+      var total = Object.values(levels).reduce(function(a,b){return a+b;}, 0);
+      if (total >= 4) strongCats.push(turbo[cat].label);
+      else if (total === 0) weakCats.push(turbo[cat].label);
+    });
+    if (strongCats.length) turboNote = 'I can see you\'ve put work into ' + strongCats.join(' and ') + ' in Turbo. That\'s where we start.';
+    if (weakCats.length) turboNote += (turboNote ? ' ' : '') + 'And ' + weakCats.join(', ') + '? Nothing there yet. We\'ll get to that.';
+  }
+
+  var openers = {
+    H1: `Right, ${name}. H1. Let me be straight with you — that grade belongs to people who write Spanish that moves. Not just accurate. Moving. Range of tenses, subjunctives where they land naturally, connectors that sound like a real person wrote them.\n\nSo. Section C. What format are you doing? Dialogue, diary, opinion piece, formal letter? Pick one and let's see what you've got.\n\n${turboNote}`,
+    H2: `${name}. Good to see you. H2 target — you're close, but close isn't there yet. The difference between H2 and H3 on Section C is usually one thing: range. Whoever wrote it could have been anyone. H2 writing has a voice.\n\nTell me — what Section C format are you planning to do? Dialogue is the most popular for a reason.\n\n${turboNote}`,
+    H3: `${name}. H3. Grand. That's a solid, honest target and I respect it.\n\nHere's what gets you there on Section C: get your structures right, get your tenses right, and say something. Don't just describe — react, opine, feel something. Examiners can tell when there's nobody home.\n\nWhat format are you planning? Dialogue, diary, note, opinion piece, formal letter?\n\n${turboNote}`,
+    H4: `${name}. Right. H4 — that's a realistic target and we're going to hit it.\n\nHonestly? Most H4 Section C answers fall down on two things: tense control and vocabulary range. We're going to sort both. Not today, not all at once — but we're going to sort them.\n\nWhat do you find hardest in written Spanish? Be honest — that's where we start.\n\n${turboNote}`,
+    O1: `${name}. O1 is absolutely on. I've seen it done from further back than you.\n\nOrdinary Level Section C rewards clarity and accuracy above all. Get your structures right, use your connectors, hit your word count, and you're most of the way there. No tricks needed.\n\nWhat Section C type are you aiming at — dialogue is usually the best bet at OL. What do you think?\n\n${turboNote}`,
+    O2: `${name}. Sit down. O2 is a good target — achievable, solid, worth fighting for.\n\nHere's the good news about OL Section C: you don't need to be a genius. You need to be organised, accurate, and consistent. We're going to find your five or six must-have structures and drill them.\n\nTell me — what are you most worried about? Vocabulary? Tenses? What to say?\n\n${turboNote}`,
+    O3: `${name}. You showed up. That matters more than you know.\n\nWherever you are right now — that's where we start. No looking back, no comparing yourself to anyone else. Just you, me, and Section C.\n\nTell me one thing: when you sit down to write Spanish, what's the first thing that makes you freeze up? Let's start there.\n\n${turboNote}`,
+  };
+
+  var opener = openers[grade] || openers['H3'];
+  addMessage('brother', opener.trim());
+  saveHistory();
+}
+
+// ============================================================
+// CHAT
+// ============================================================
+function setSectionType(type, btn) {
+  state.sectionType = type;
+  document.querySelectorAll('.section-pip').forEach(function(p) { p.classList.remove('active'); });
+  btn.classList.add('active');
+}
+
+function renderHistory() {
+  var container = document.getElementById('chat-messages');
+  container.innerHTML = '';
+  state.history.forEach(function(msg) { renderMessage(msg.role, msg.content, false); });
+  scrollToBottom();
+}
+
+function addMessage(role, content) {
+  state.history.push({ role, content });
+  saveHistory();
+  renderMessage(role, content, true);
+  scrollToBottom();
+}
+
+function renderMessage(role, content, animate) {
+  var container = document.getElementById('chat-messages');
+  var wrapper = document.createElement('div');
+  wrapper.className = 'msg ' + role;
+  if (!animate) wrapper.style.animation = 'none';
+
+  var avatar = document.createElement('div');
+  avatar.className = 'msg-avatar';
+  avatar.textContent = role === 'brother' ? '🧓' : '🧑';
+
+  var bubble = document.createElement('div');
+  bubble.className = 'msg-bubble';
+
+  var formatted = escHtml(content)
+    .replace(/\n\n/g, '</p><p>')
+    .replace(/\n/g, '<br>');
+  bubble.innerHTML = '<p>' + formatted + '</p>';
+
+  wrapper.appendChild(avatar);
+  wrapper.appendChild(bubble);
+  container.appendChild(wrapper);
+}
+
+function showTyping() {
+  var container = document.getElementById('chat-messages');
+  var wrapper = document.createElement('div');
+  wrapper.className = 'msg brother';
+  wrapper.id = 'typing-indicator';
+  var avatar = document.createElement('div');
+  avatar.className = 'msg-avatar';
+  avatar.textContent = '🧓';
+  var bubble = document.createElement('div');
+  bubble.className = 'typing-indicator';
+  bubble.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+  wrapper.appendChild(avatar);
+  wrapper.appendChild(bubble);
+  container.appendChild(wrapper);
+  scrollToBottom();
+}
+
+function hideTyping() {
+  var el = document.getElementById('typing-indicator');
+  if (el) el.remove();
+}
+
+async function sendMessage() {
+  var input = document.getElementById('chat-input');
+  var text = input.value.trim();
+  if (!text) return;
+
+  input.value = '';
+  autoResize(input);
+  addMessage('user', text);
+  showTyping();
+  document.getElementById('send-btn').disabled = true;
+
+  try {
+    var turboSummary = buildTurboSummary();
+
+    var res = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        mode: 'lc_chat',
+        name: state.name,
+        grade: state.grade,
+        section_type: state.sectionType,
+        history: state.history,
+        turbo_summary: turboSummary,
+        total_stars: state.totalStars,
+      })
+    });
+    var data = await res.json();
+    hideTyping();
+
+    var reply = data.reply || data.error || 'Something went wrong there. Try again.';
+
+    // Occasional quote (every ~8 messages)
+    if (state.history.length % 8 === 7) {
+      var q = QUOTES[Math.floor(Math.random() * QUOTES.length)];
+      reply += '\n\n💬 "' + q.en + '"\n' + q.es;
+    }
+
+    addMessage('brother', reply);
+  } catch(err) {
+    hideTyping();
+    console.error(err);
+    addMessage('brother', "Lost the connection there. Don't panic — try again.");
+  }
+
+  document.getElementById('send-btn').disabled = false;
+}
+
+function buildTurboSummary() {
+  if (!state.turboData) return 'No Turbo data available.';
+  var lines = [];
+  Object.keys(state.turboData).forEach(function(cat) {
+    var d = state.turboData[cat];
+    var levels = Object.keys(d.levels);
+    if (levels.length === 0) {
+      lines.push(d.label + ': not attempted');
+    } else {
+      var stars = Object.values(d.levels).reduce(function(a,b){return a+b;},0);
+      var maxLevel = Math.max.apply(null, levels.map(Number));
+      lines.push(d.label + ': ' + stars + ' stars, reached level ' + maxLevel);
+    }
+  });
+  return lines.join(' | ');
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+
+function useHint(text) {
+  document.getElementById('chat-input').value = text;
+  sendMessage();
+}
+
+// ============================================================
+// WRITE & MARK — student submits Spanish text, Brother marks it
+// ============================================================
+function triggerWrite() {
+  var container = document.getElementById('chat-messages');
+
+  // Remove any existing write zone
+  var existing = document.getElementById('write-zone-el');
+  if (existing) { existing.remove(); return; }
+
+  var wrapper = document.createElement('div');
+  wrapper.className = 'msg brother';
+  wrapper.id = 'write-zone-el';
+  wrapper.style.animation = 'none';
+
+  var avatar = document.createElement('div');
+  avatar.className = 'msg-avatar';
+  avatar.textContent = '🧓';
+
+  var zone = document.createElement('div');
+  zone.className = 'write-zone';
+  zone.innerHTML = `
+    <div style="font-size:0.78rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">
+      ✏️ Write — ${SECTION_LABELS[state.sectionType]}
+    </div>
+    <textarea id="student-write" placeholder="Write your Spanish here — a dialogue turn, diary entry, sentence, whatever you're working on..."></textarea>
+    <div class="write-zone-footer">
+      <button class="mark-btn" onclick="markWriting()">📝 Mark it</button>
+    </div>
+  `;
+
+  wrapper.appendChild(avatar);
+  wrapper.appendChild(zone);
+  container.appendChild(wrapper);
+  scrollToBottom();
+  document.getElementById('student-write').focus();
+}
+
+async function markWriting() {
+  var text = document.getElementById('student-write').value.trim();
+  if (!text || text.length < 5) {
+    alert('Write something first.');
+    return;
+  }
+
+  // Remove write zone
+  var zone = document.getElementById('write-zone-el');
+  if (zone) zone.remove();
+
+  // Show student's text as a message
+  addMessage('user', text);
+  showTyping();
+  document.getElementById('send-btn').disabled = true;
+
+  try {
+    var res = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        mode: 'lc_mark',
+        name: state.name,
+        grade: state.grade,
+        section_type: state.sectionType,
+        writing: text,
+        turbo_summary: buildTurboSummary(),
+      })
+    });
+    var data = await res.json();
+    hideTyping();
+
+    var reply = data.reply || data.error || 'Something went wrong with marking. Try again.';
+    addMessage('brother', reply);
+  } catch(err) {
+    hideTyping();
+    addMessage('brother', "Couldn't send that for marking. Check your connection.");
+  }
+
+  document.getElementById('send-btn').disabled = false;
+}
+
+// ============================================================
+// VOICE
+// ============================================================
+var recognition = null;
+var isListening = false;
+
+function toggleVoice() {
+  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+    alert('Voice input works best in Chrome.');
+    return;
+  }
+  if (isListening) { recognition.stop(); return; }
+
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SR();
+  recognition.lang = 'es-ES';
+  recognition.continuous = false;
+  recognition.interimResults = false;
+
+  recognition.onstart = function() {
+    isListening = true;
+    document.getElementById('voice-btn').classList.add('listening');
+    document.getElementById('voice-btn').textContent = '🔴';
+  };
+  recognition.onresult = function(e) {
+    document.getElementById('chat-input').value = e.results[0][0].transcript;
+  };
+  recognition.onend = function() {
+    isListening = false;
+    document.getElementById('voice-btn').classList.remove('listening');
+    document.getElementById('voice-btn').textContent = '🎤';
+  };
+  recognition.start();
+}
+
+// ============================================================
+// UTILS
+// ============================================================
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
+  document.getElementById(id).classList.add('active');
+}
+
+function scrollToBottom() {
+  var msgs = document.getElementById('chat-messages');
+  if (msgs) msgs.scrollTop = msgs.scrollHeight;
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+function saveHistory() {
+  localStorage.setItem('lc_brother_history', JSON.stringify(state.history.slice(-50)));
+}
+
+function goHome() { showScreen('screen-welcome'); }
+
+function escHtml(str) {
+  return String(str || '')
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+}
+</script>
+</body>
+</html>

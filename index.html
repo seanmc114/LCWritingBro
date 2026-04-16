@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TURBO LC — Spanish</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; background-color: #1a1a2e; }
+    .container { text-align: center; width: 100%; max-width: 620px; padding: 30px; background-color: rgba(255,255,255,0.97); border-radius: 20px; margin: 20px; box-shadow: 0 6px 20px rgba(0,0,0,0.4); color: #333; }
+    h1 { font-size: 3.6rem; color: #c0392b; margin-bottom: 4px; font-style: italic; letter-spacing: -1px; }
+    .subtitle { color: #888; font-size: 0.8rem; margin-bottom: 18px; letter-spacing: 1px; text-transform: uppercase; }
+
+    /* Progress bar */
+    .progress-wrap { margin-bottom: 18px; }
+    .progress-label { font-size: 0.82rem; color: #666; margin-bottom: 5px; display: flex; justify-content: space-between; }
+    .progress-track { background: #eee; border-radius: 50px; height: 10px; }
+    .progress-fill { height: 100%; border-radius: 50px; background: linear-gradient(90deg, #c0392b, #e67e22); transition: width 0.4s; }
+
+    /* Star counter */
+    .star-banner { background: #fff8e1; border: 2px solid #f39c12; border-radius: 12px; padding: 10px 16px; margin-bottom: 18px; font-size: 0.9rem; color: #7f4f00; font-weight: bold; }
+
+    /* Category buttons */
+    #cat-buttons { margin-bottom: 18px; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+    .cat-btn { background: #eee; color: #555; font-size: 0.82rem; padding: 7px 14px; border: none; border-radius: 20px; cursor: pointer; transition: all 0.2s; }
+    .cat-btn:hover { background: #ccc; }
+    .cat-btn.active { background: #c0392b; color: white; font-weight: bold; }
+
+    /* Level list */
+    #level-list { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 10px; }
+    .level-btn { font-size: 1rem; padding: 13px 16px; background-color: #2ecc71; color: white; border-radius: 10px; border: none; cursor: pointer; width: 92%; max-width: 340px; transition: transform 0.2s, background-color 0.2s; display: flex; justify-content: space-between; align-items: center; }
+    .level-btn:hover { background-color: #27ae60; transform: scale(1.03); }
+    .level-btn:disabled { background-color: #bdc3c7; cursor: not-allowed; transform: none; color: #888; }
+    .level-btn.h1-zone { background-color: #8e44ad; }
+    .level-btn.h1-zone:hover { background-color: #7d3c98; }
+    .level-btn.future-zone { background-color: #2980b9; }
+    .level-btn.future-zone:hover { background-color: #1a6fa1; }
+    .brother-btn { background: linear-gradient(135deg, #2d5a27, #3d7a35) !important; font-size: 1rem !important; justify-content: center !important; }
+    .brother-btn:hover { filter: brightness(1.1); }
+
+    .level-badge { font-size: 0.72rem; background: rgba(255,255,255,0.25); padding: 2px 8px; border-radius: 10px; }
+
+    /* Game */
+    #game { display: none; margin-top: 16px; }
+    #timer { font-size: 1.35rem; color: #c0392b; margin-bottom: 14px; font-weight: bold; }
+    #questions div { margin: 12px 0; font-size: 1rem; text-align: left; }
+    #questions input { font-size: 1rem; padding: 8px 10px; width: 100%; margin-top: 5px; border: 2px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+    #questions .prompt-row { display: flex; align-items: center; gap: 6px; }
+    #questions .speak-prompt { background: none; border: none; cursor: pointer; font-size: 1.1rem; padding: 0 2px; }
+
+    #submit { font-size: 1.3rem; padding: 13px 26px; background-color: #e67e22; color: white; border-radius: 12px; cursor: pointer; margin: 14px 4px 4px; transition: transform 0.2s, background-color 0.2s; border: none; }
+    #submit:hover { background-color: #ca6f1e; transform: scale(1.04); }
+
+    #results { margin-top: 16px; font-size: 1rem; text-align: left; }
+    .try-again, #back-button { font-size: 1.1rem; padding: 11px 22px; background-color: #e67e22; color: white; border-radius: 10px; cursor: pointer; margin: 7px 4px; border: none; transition: transform 0.2s; }
+    .try-again:hover, #back-button:hover { background-color: #ca6f1e; transform: scale(1.04); }
+    .perfect-celebration { font-size: 1.8rem; color: gold; margin-bottom: 12px; }
+    .unlock-msg { color: #2d5a27; font-weight: bold; font-size: 1rem; margin: 8px 0; }
+
+    /* Voice btn */
+    .voice-btn-inline { background: #eee; border: 2px solid #ccc; border-radius: 6px; padding: 6px 10px; cursor: pointer; font-size: 0.85rem; margin-top: 5px; transition: all 0.2s; }
+    .voice-btn-inline.listening { background: #fee; border-color: #c0392b; }
+    .voice-btn-inline:hover { background: #ddd; }
+
+    /* Zone labels */
+    .zone-label { font-size: 0.72rem; color: #999; text-transform: uppercase; letter-spacing: 1px; margin: 8px 0 4px; font-weight: bold; }
+
+    footer { margin-top: 28px; font-size: 0.72rem; color: #aaa; border-top: 1px solid #eee; padding-top: 12px; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>TURBO LC</h1>
+  <p class="subtitle">Leaving Cert Spanish · Section C · Written Production</p>
+
+  <!-- Progress -->
+  <div class="progress-wrap">
+    <div class="progress-label"><span>Stars to unlock The Brother</span><span id="progress-pct">0%</span></div>
+    <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  </div>
+
+  <div class="star-banner" id="star-banner">⭐ 0 stars earned — do 5 to unlock The Brother</div>
+
+  <!-- Category -->
+  <div id="cat-buttons">
+    <button class="cat-btn active" onclick="selectCat('dialogue',this)">💬 Dialogue</button>
+    <button class="cat-btn" onclick="selectCat('diary',this)">📔 Diary</button>
+    <button class="cat-btn" onclick="selectCat('note',this)">✉️ Note / Email</button>
+    <button class="cat-btn" onclick="selectCat('opinion',this)">🗣️ Opinion</button>
+    <button class="cat-btn" onclick="selectCat('formal',this)">📋 Formal Letter</button>
+  </div>
+
+  <!-- Level list -->
+  <div id="level-list"></div>
+
+  <!-- Game -->
+  <div id="game">
+    <div id="timer">Time: 0s</div>
+    <div id="questions"></div>
+    <button id="submit">Check Answers</button>
+    <div id="results"></div>
+  </div>
+
+  <footer>© 2026 Synge Street Games: Imagination and Perseverance</footer>
+</div>
+
+<script>
+// ============================================================
+// LC TURBO PHRASE DATA
+// Real structures from LC Spanish Section C past papers
+// Categories: dialogue, diary, note, opinion, formal
+// Levels 1-3: present+past | 4-6: future+conditional | 7-8: subjunctive+gustar | 9-10: H1 complex
+// ============================================================
+const PHRASES = {
+
+  // ---- DIALOGUE ----
+  dialogue: [
+    // Levels 1-3: Present & past tense dialogue turns
+    {en:"Hello, how are you?",tl:"Hola, ¿cómo estás?",lv:1},
+    {en:"I am very well, thanks",tl:"Estoy muy bien, gracias",lv:1},
+    {en:"Where are you from?",tl:"¿De dónde eres?",lv:1},
+    {en:"I am from Dublin",tl:"Soy de Dublín",lv:1},
+    {en:"How old are you?",tl:"¿Cuántos años tienes?",lv:1},
+    {en:"I am seventeen years old",tl:"Tengo diecisiete años",lv:1},
+    {en:"What do you do in your free time?",tl:"¿Qué haces en tu tiempo libre?",lv:1},
+    {en:"I play football at the weekend",tl:"Juego al fútbol el fin de semana",lv:1},
+    {en:"Did you enjoy the party?",tl:"¿Te gustó la fiesta?",lv:2},
+    {en:"Yes, I had a great time",tl:"Sí, me lo pasé muy bien",lv:2},
+    {en:"What did you do yesterday?",tl:"¿Qué hiciste ayer?",lv:2},
+    {en:"I went to the cinema with my friends",tl:"Fui al cine con mis amigos",lv:2},
+    {en:"How was the film?",tl:"¿Cómo fue la película?",lv:2},
+    {en:"It was brilliant, I really enjoyed it",tl:"Fue genial, me gustó mucho",lv:2},
+    {en:"Have you been to Spain before?",tl:"¿Has estado en España antes?",lv:3},
+    {en:"Yes, I went last summer with my family",tl:"Sí, fui el verano pasado con mi familia",lv:3},
+    {en:"What is your favourite subject at school?",tl:"¿Cuál es tu asignatura favorita en el instituto?",lv:3},
+    {en:"My favourite subject is Spanish because it is interesting",tl:"Mi asignatura favorita es el español porque es interesante",lv:3},
+    {en:"Do you get on well with your family?",tl:"¿Te llevas bien con tu familia?",lv:3},
+    {en:"Yes, I get on very well with my parents",tl:"Sí, me llevo muy bien con mis padres",lv:3},
+    // Levels 4-6: Future & conditional
+    {en:"What will you do after the Leaving Cert?",tl:"¿Qué harás después del Leaving Cert?",lv:4},
+    {en:"I will go to university to study medicine",tl:"Iré a la universidad para estudiar medicina",lv:4},
+    {en:"Would you like to visit Spain?",tl:"¿Te gustaría visitar España?",lv:4},
+    {en:"Yes, I would love to visit Barcelona",tl:"Sí, me encantaría visitar Barcelona",lv:4},
+    {en:"Where will you live in the future?",tl:"¿Dónde vivirás en el futuro?",lv:5},
+    {en:"I think I will live abroad for a few years",tl:"Creo que viviré en el extranjero durante unos años",lv:5},
+    {en:"What would you do if you won the lottery?",tl:"¿Qué harías si ganaras la lotería?",lv:5},
+    {en:"I would travel around the world",tl:"Viajaría por todo el mundo",lv:5},
+    {en:"Will you continue studying Spanish?",tl:"¿Seguirás estudiando español?",lv:6},
+    {en:"Yes, Spanish will be very useful for my career",tl:"Sí, el español será muy útil para mi carrera",lv:6},
+    {en:"What would you change about your school?",tl:"¿Qué cambiarías de tu instituto?",lv:6},
+    {en:"I would make the school day shorter",tl:"Acortaría la jornada escolar",lv:6},
+    // Levels 7-8: Subjunctive & gustar constructions
+    {en:"I hope that the exam goes well",tl:"Espero que el examen salga bien",lv:7},
+    {en:"It surprises me that people do not speak more languages",tl:"Me sorprende que la gente no hable más idiomas",lv:7},
+    {en:"My teacher recommends that we practise every day",tl:"Mi profesora recomienda que practiquemos todos los días",lv:7},
+    {en:"I am delighted that you are coming to Ireland",tl:"Me alegra que vengas a Irlanda",lv:7},
+    {en:"It bothers me that there is so much pollution",tl:"Me molesta que haya tanta contaminación",lv:8},
+    {en:"I doubt that it will rain tomorrow",tl:"Dudo que llueva mañana",lv:8},
+    {en:"It seems important to me that young people travel",tl:"Me parece importante que los jóvenes viajen",lv:8},
+    {en:"I am glad that we have met",tl:"Me alegro de que nos hayamos conocido",lv:8},
+    // Levels 9-10: H1 complex mixed
+    {en:"Not only do I love sport but I also think it is essential for mental health",tl:"No solo me encanta el deporte sino que también creo que es esencial para la salud mental",lv:9},
+    {en:"Although I find exams stressful, I understand their importance",tl:"Aunque encuentro los exámenes estresantes, entiendo su importancia",lv:9},
+    {en:"If I had studied harder, I would have got better results",tl:"Si hubiera estudiado más, habría obtenido mejores resultados",lv:9},
+    {en:"The more I practise Spanish, the more confident I feel",tl:"Cuanto más practico el español, más seguro me siento",lv:10},
+    {en:"It is a pity that so many young people are under so much pressure",tl:"Es una pena que tantos jóvenes estén bajo tanta presión",lv:10},
+    {en:"Having lived in Dublin all my life, I would love to experience another culture",tl:"Habiendo vivido en Dublín toda mi vida, me encantaría experimentar otra cultura",lv:10},
+  ],
+
+  // ---- DIARY ----
+  diary: [
+    // 1-3: Present & past
+    {en:"Today I got up early",tl:"Hoy me levanté temprano",lv:1},
+    {en:"This morning I had breakfast with my family",tl:"Esta mañana desayuné con mi familia",lv:1},
+    {en:"I went to school by bus",tl:"Fui al instituto en autobús",lv:1},
+    {en:"Today was a difficult day at school",tl:"Hoy fue un día difícil en el instituto",lv:1},
+    {en:"After school I did my homework",tl:"Después del instituto hice mis deberes",lv:2},
+    {en:"Last night I watched a film with my friends",tl:"Anoche vi una película con mis amigos",lv:2},
+    {en:"Yesterday I felt very nervous before the exam",tl:"Ayer me sentí muy nervioso antes del examen",lv:2},
+    {en:"The weather was terrible today",tl:"El tiempo estuvo horrible hoy",lv:2},
+    {en:"I spent the whole day studying in the library",tl:"Pasé todo el día estudiando en la biblioteca",lv:3},
+    {en:"My mother cooked a delicious dinner",tl:"Mi madre cocinó una cena deliciosa",lv:3},
+    {en:"I had an argument with my best friend today",tl:"Hoy tuve una discusión con mi mejor amigo",lv:3},
+    {en:"Fortunately we made up in the evening",tl:"Afortunadamente nos reconciliamos por la tarde",lv:3},
+    // 4-6: Future & conditional
+    {en:"Tomorrow I will have to get up at six",tl:"Mañana tendré que levantarme a las seis",lv:4},
+    {en:"Next week I will start preparing for the oral exam",tl:"La semana que viene empezaré a prepararme para el oral",lv:4},
+    {en:"I told myself that I would study more this year",tl:"Me dije que estudiaría más este año",lv:4},
+    {en:"If only I had more time to relax",tl:"Ojalá tuviera más tiempo para relajarme",lv:5},
+    {en:"Next month everything will change after the Leaving Cert",tl:"El mes que viene todo cambiará después del Leaving Cert",lv:5},
+    {en:"I decided that I would no longer waste time on social media",tl:"Decidí que ya no perdería tiempo en las redes sociales",lv:5},
+    {en:"I will have to be much more organised from now on",tl:"Tendré que ser mucho más organizado a partir de ahora",lv:6},
+    {en:"I promised myself that I would exercise every day",tl:"Me prometí a mí mismo que haría ejercicio todos los días",lv:6},
+    // 7-8: Subjunctive & gustar
+    {en:"It makes me happy that my parents support me",tl:"Me alegra que mis padres me apoyen",lv:7},
+    {en:"I hope that tomorrow will be a better day",tl:"Espero que mañana sea un día mejor",lv:7},
+    {en:"It frustrates me that I cannot find time to relax",tl:"Me frustra que no pueda encontrar tiempo para relajarme",lv:7},
+    {en:"My parents want me to do my best in the exams",tl:"Mis padres quieren que haga lo mejor posible en los exámenes",lv:8},
+    {en:"It seems incredible to me that the year has passed so quickly",tl:"Me parece increíble que el año haya pasado tan rápido",lv:8},
+    {en:"I doubt that anyone will remember this day in ten years",tl:"Dudo que alguien recuerde este día dentro de diez años",lv:8},
+    // 9-10: H1 complex
+    {en:"Despite the pressure, I have tried to maintain a positive attitude",tl:"A pesar de la presión, he intentado mantener una actitud positiva",lv:9},
+    {en:"Reflecting on the year, I realise how much I have grown",tl:"Reflexionando sobre el año, me doy cuenta de cuánto he crecido",lv:9},
+    {en:"Not only have I worked hard but I have also learned a lot about myself",tl:"No solo he trabajado duro sino que también he aprendido mucho sobre mí mismo",lv:9},
+    {en:"Looking back on it all, I would not change a thing",tl:"Mirando atrás, no cambiaría nada",lv:10},
+    {en:"The experience has been as enriching as it has been exhausting",tl:"La experiencia ha sido tan enriquecedora como agotadora",lv:10},
+    {en:"Were it not for my friends, this year would have been much harder",tl:"Si no fuera por mis amigos, este año habría sido mucho más difícil",lv:10},
+  ],
+
+  // ---- NOTE / EMAIL ----
+  note: [
+    // 1-3
+    {en:"Dear María",tl:"Querida María",lv:1},
+    {en:"I am writing to tell you some good news",tl:"Te escribo para contarte una buena noticia",lv:1},
+    {en:"Thank you for your letter",tl:"Gracias por tu carta",lv:1},
+    {en:"I am very happy to hear that",tl:"Me alegra mucho escuchar eso",lv:1},
+    {en:"I am sorry I did not reply sooner",tl:"Siento no haberte contestado antes",lv:2},
+    {en:"I have been very busy with school lately",tl:"He estado muy ocupado con el instituto últimamente",lv:2},
+    {en:"My family and I went on holiday last summer",tl:"Mi familia y yo fuimos de vacaciones el verano pasado",lv:2},
+    {en:"We stayed in a small hotel near the beach",tl:"Nos quedamos en un pequeño hotel cerca de la playa",lv:2},
+    {en:"I hope that you and your family are well",tl:"Espero que tú y tu familia estéis bien",lv:3},
+    {en:"Can you help me with a problem?",tl:"¿Puedes ayudarme con un problema?",lv:3},
+    {en:"I look forward to hearing from you soon",tl:"Espero tener noticias tuyas pronto",lv:3},
+    {en:"Give my regards to your family",tl:"Dale recuerdos a tu familia de mi parte",lv:3},
+    // 4-6
+    {en:"I wanted to let you know that I will arrive on Friday",tl:"Quería avisarte de que llegaré el viernes",lv:4},
+    {en:"I would like to ask you a favour",tl:"Me gustaría pedirte un favor",lv:4},
+    {en:"Would it be possible to meet on Saturday?",tl:"¿Sería posible quedar el sábado?",lv:4},
+    {en:"I am writing to tell you about our plans for the summer",tl:"Te escribo para contarte nuestros planes para el verano",lv:5},
+    {en:"I was wondering if you would like to visit Ireland",tl:"Me preguntaba si te gustaría visitar Irlanda",lv:5},
+    {en:"If you come in July the weather will be much better",tl:"Si vienes en julio el tiempo será mucho mejor",lv:5},
+    {en:"I would be delighted if you could come to stay with us",tl:"Me encantaría que vinieras a quedarte con nosotros",lv:6},
+    {en:"We would have such a good time together",tl:"Lo pasaríamos tan bien juntos",lv:6},
+    // 7-8
+    {en:"I am so glad that you passed your exams",tl:"Me alegra tanto que hayas aprobado tus exámenes",lv:7},
+    {en:"It is a shame that you cannot come to the party",tl:"Es una pena que no puedas venir a la fiesta",lv:7},
+    {en:"I hope that everything works out well for you",tl:"Espero que todo te salga bien",lv:7},
+    {en:"My mother insists that you stay for dinner when you visit",tl:"Mi madre insiste en que te quedes a cenar cuando visites",lv:8},
+    {en:"It moves me that you remembered my birthday",tl:"Me emociona que hayas recordado mi cumpleaños",lv:8},
+    {en:"I suggest that we meet in the city centre",tl:"Sugiero que quedemos en el centro de la ciudad",lv:8},
+    // 9-10
+    {en:"Although we have not seen each other for a long time, I often think of you",tl:"Aunque no nos hemos visto desde hace mucho tiempo, a menudo pienso en ti",lv:9},
+    {en:"Not a day goes by without me thinking about our trip to Salamanca",tl:"No pasa un día sin que piense en nuestro viaje a Salamanca",lv:9},
+    {en:"Whatever happens, I know our friendship will last",tl:"Pase lo que pase, sé que nuestra amistad durará",lv:10},
+    {en:"Looking forward to the day when we can finally meet again",tl:"Esperando con ilusión el día en que podamos vernos de nuevo",lv:10},
+  ],
+
+  // ---- OPINION PIECE ----
+  opinion: [
+    // 1-3
+    {en:"In my opinion young people spend too much time on their phones",tl:"En mi opinión los jóvenes pasan demasiado tiempo con el móvil",lv:1},
+    {en:"I think that sport is very important for health",tl:"Creo que el deporte es muy importante para la salud",lv:1},
+    {en:"I believe that music brings people together",tl:"Pienso que la música une a las personas",lv:1},
+    {en:"First of all I would like to say that...",tl:"En primer lugar me gustaría decir que...",lv:1},
+    {en:"On the other hand there are people who think that...",tl:"Por otro lado hay personas que piensan que...",lv:2},
+    {en:"For example in Spain young people often...",tl:"Por ejemplo en España los jóvenes a menudo...",lv:2},
+    {en:"However it is important to remember that...",tl:"Sin embargo es importante recordar que...",lv:2},
+    {en:"As a result many teenagers feel stressed",tl:"Como resultado muchos adolescentes se sienten estresados",lv:2},
+    {en:"Although I understand this point of view, I disagree",tl:"Aunque entiendo este punto de vista, no estoy de acuerdo",lv:3},
+    {en:"It cannot be denied that social media has changed our lives",tl:"No se puede negar que las redes sociales han cambiado nuestras vidas",lv:3},
+    {en:"Furthermore studies have shown that...",tl:"Además los estudios han demostrado que...",lv:3},
+    {en:"In conclusion I believe that we all have a responsibility",tl:"En conclusión creo que todos tenemos una responsabilidad",lv:3},
+    // 4-6
+    {en:"If governments invested more in education, the results would be better",tl:"Si los gobiernos invirtieran más en educación, los resultados serían mejores",lv:4},
+    {en:"In the future technology will play an even greater role in our lives",tl:"En el futuro la tecnología desempeñará un papel aún mayor en nuestras vidas",lv:4},
+    {en:"Without doubt this problem will get worse if we do nothing",tl:"Sin duda este problema empeorará si no hacemos nada",lv:4},
+    {en:"I would argue that the solution lies in education",tl:"Yo diría que la solución está en la educación",lv:5},
+    {en:"Were we to take this issue more seriously, things would improve",tl:"Si tomáramos este tema más en serio, las cosas mejorarían",lv:5},
+    {en:"It would be a mistake to ignore the impact of climate change",tl:"Sería un error ignorar el impacto del cambio climático",lv:5},
+    {en:"This would not only benefit individuals but also society as a whole",tl:"Esto no solo beneficiaría a los individuos sino también a la sociedad en general",lv:6},
+    {en:"There can be no doubt that young people deserve more support",tl:"No cabe duda de que los jóvenes merecen más apoyo",lv:6},
+    // 7-8
+    {en:"It is essential that we act before it is too late",tl:"Es esencial que actuemos antes de que sea demasiado tarde",lv:7},
+    {en:"It is alarming that so many young people suffer from anxiety",tl:"Es alarmante que tantos jóvenes sufran de ansiedad",lv:7},
+    {en:"I recommend that everyone learns at least one foreign language",tl:"Recomiendo que todo el mundo aprenda al menos un idioma extranjero",lv:7},
+    {en:"It is vital that governments take this problem seriously",tl:"Es vital que los gobiernos se tomen este problema en serio",lv:8},
+    {en:"We cannot accept that future generations inherit a damaged planet",tl:"No podemos aceptar que las generaciones futuras hereden un planeta dañado",lv:8},
+    {en:"I propose that schools dedicate more time to mental health",tl:"Propongo que las escuelas dediquen más tiempo a la salud mental",lv:8},
+    // 9-10
+    {en:"Far from being a problem, diversity is in fact our greatest strength",tl:"Lejos de ser un problema, la diversidad es en realidad nuestra mayor fortaleza",lv:9},
+    {en:"The more connected we become digitally, the more isolated we feel in reality",tl:"Cuanto más conectados estamos digitalmente, más aislados nos sentimos en la realidad",lv:9},
+    {en:"Not only must we acknowledge this crisis but we must also take concrete steps to address it",tl:"No solo debemos reconocer esta crisis sino que también debemos tomar medidas concretas para abordarla",lv:9},
+    {en:"It is high time that society stopped placing so much pressure on young people",tl:"Ya es hora de que la sociedad deje de ejercer tanta presión sobre los jóvenes",lv:10},
+    {en:"However much we try to deny it, the evidence is overwhelming",tl:"Por mucho que intentemos negarlo, la evidencia es abrumadora",lv:10},
+    {en:"This issue touches the very heart of who we are as a society",tl:"Este tema toca el mero corazón de quiénes somos como sociedad",lv:10},
+  ],
+
+  // ---- FORMAL LETTER ----
+  formal: [
+    // 1-3
+    {en:"Dear Sir or Madam",tl:"Muy señor mío / Muy señora mía",lv:1},
+    {en:"I am writing to make a complaint",tl:"Me dirijo a usted para presentar una queja",lv:1},
+    {en:"I am writing to request information about...",tl:"Me pongo en contacto con usted para solicitar información sobre...",lv:1},
+    {en:"I recently purchased a product in your shop",tl:"Recientemente compré un producto en su tienda",lv:1},
+    {en:"Unfortunately the product was damaged when it arrived",tl:"Desafortunadamente el producto llegó dañado",lv:2},
+    {en:"I would like to request a full refund",tl:"Me gustaría solicitar el reembolso completo",lv:2},
+    {en:"I am very disappointed with the service I received",tl:"Estoy muy decepcionado con el servicio que recibí",lv:2},
+    {en:"I expect a prompt response to this matter",tl:"Espero una respuesta rápida a este asunto",lv:2},
+    {en:"I look forward to your reply",tl:"Quedo a la espera de su respuesta",lv:3},
+    {en:"Yours faithfully",tl:"Le saluda atentamente",lv:3},
+    {en:"I would be grateful if you could resolve this issue",tl:"Le agradecería que pudiera resolver este problema",lv:3},
+    {en:"Please do not hesitate to contact me",tl:"No dude en ponerse en contacto conmigo",lv:3},
+    // 4-6
+    {en:"I am writing with regard to the advertisement that appeared in your newspaper",tl:"Me dirijo a usted con respecto al anuncio que apareció en su periódico",lv:4},
+    {en:"I would like to apply for the position of summer intern",tl:"Me gustaría solicitar el puesto de becario de verano",lv:4},
+    {en:"I believe I have the skills required for this position",tl:"Creo que tengo las habilidades requeridas para este puesto",lv:4},
+    {en:"Should you require any further information please do not hesitate to contact me",tl:"Si necesita más información, no dude en ponerse en contacto conmigo",lv:5},
+    {en:"I would appreciate the opportunity to discuss this matter further",tl:"Agradecería la oportunidad de tratar este asunto más detenidamente",lv:5},
+    {en:"I am available for interview at your earliest convenience",tl:"Estoy disponible para una entrevista cuando usted lo considere oportuno",lv:5},
+    {en:"I attach my curriculum vitae for your consideration",tl:"Adjunto mi currículum para su consideración",lv:6},
+    {en:"I can assure you that I am a reliable and hardworking person",tl:"Le aseguro que soy una persona fiable y trabajadora",lv:6},
+    // 7-8
+    {en:"I request that this matter be dealt with as a matter of urgency",tl:"Solicito que este asunto se trate con carácter urgente",lv:7},
+    {en:"It is imperative that the company takes responsibility for this error",tl:"Es imprescindible que la empresa asuma la responsabilidad de este error",lv:7},
+    {en:"I insist that I receive a written explanation within five working days",tl:"Exijo que reciba una explicación por escrito en un plazo de cinco días hábiles",lv:7},
+    {en:"I trust that you will take the necessary steps to prevent this from happening again",tl:"Confío en que tomará las medidas necesarias para que esto no vuelva a ocurrir",lv:8},
+    {en:"I would suggest that the company review its customer service procedures",tl:"Sugeriría que la empresa revisara sus procedimientos de atención al cliente",lv:8},
+    {en:"I feel it is only right that customers are treated with respect",tl:"Creo que es justo que los clientes sean tratados con respeto",lv:8},
+    // 9-10
+    {en:"Having been a loyal customer for many years, I find this situation wholly unacceptable",tl:"Siendo cliente leal desde hace muchos años, encuentro esta situación totalmente inaceptable",lv:9},
+    {en:"Not only was the service poor but the staff were also rude and unhelpful",tl:"No solo fue deficiente el servicio sino que además el personal fue grosero y poco servicial",lv:9},
+    {en:"I reserve the right to take this matter to the relevant consumer protection authority",tl:"Me reservo el derecho de llevar este asunto a la autoridad competente de protección al consumidor",lv:9},
+    {en:"It goes without saying that a company of your standing should uphold higher standards",tl:"No hace falta decir que una empresa de su prestigio debería mantener estándares más altos",lv:10},
+    {en:"I would strongly urge you to reconsider your position in this matter",tl:"Le instaria encarecidamente a reconsiderar su postura en este asunto",lv:10},
+  ],
+};
+
+// ============================================================
+// GAME STATE
+// ============================================================
+const BROTHER_UNLOCK    = 5;   // Very low — The Brother does the rest
+const PENALTY_SECS      = 20;
+const QUESTIONS_PER_LEVEL = 6;
+const STORAGE_PREFIX    = 'lc_turbo_';
+
+let currentCat    = 'dialogue';
+let currentLevel  = 1;
+let currentPhrases= [];
+let startTime, timerInterval;
+
+const levelList          = document.getElementById('level-list');
+const gameContainer      = document.getElementById('game');
+const questionsContainer = document.getElementById('questions');
+const resultsContainer   = document.getElementById('results');
+
+// ============================================================
+// LOCALSTORAGE
+// ============================================================
+function getUnlocked()            { return parseInt(localStorage.getItem(STORAGE_PREFIX+'unlocked') || '1'); }
+function setUnlocked(level)       { if (level > getUnlocked()) localStorage.setItem(STORAGE_PREFIX+'unlocked', level); }
+function getBest(cat, level)      { return localStorage.getItem(STORAGE_PREFIX+'best_'+cat+'_'+level); }
+function setBest(cat, level, stars) {
+  const prev = parseInt(getBest(cat, level) || '0');
+  if (stars > prev) localStorage.setItem(STORAGE_PREFIX+'best_'+cat+'_'+level, stars);
+}
+function getTotalStars() {
+  let total = 0;
+  ['dialogue','diary','note','opinion','formal'].forEach(function(c) {
+    for (var v = 1; v <= 10; v++) total += parseInt(getBest(c, v) || '0');
+  });
+  return total;
+}
+function brotherUnlocked() { return getTotalStars() >= BROTHER_UNLOCK; }
+
+// Get detailed star shape for Brother coaching
+function getTurboData() {
+  const cats = ['dialogue','diary','note','opinion','formal'];
+  const catLabels = { dialogue:'Dialogue', diary:'Diary', note:'Note/Email', opinion:'Opinion Piece', formal:'Formal Letter' };
+  const data = {};
+  cats.forEach(function(cat) {
+    data[cat] = { label: catLabels[cat], levels: {} };
+    for (var lv = 1; lv <= 10; lv++) {
+      const s = getBest(cat, lv);
+      if (s) data[cat].levels[lv] = parseInt(s);
+    }
+  });
+  return data;
+}
+
+// ============================================================
+// CATEGORY SELECTOR
+// ============================================================
+function selectCat(cat, btn) {
+  currentCat = cat;
+  document.querySelectorAll('.cat-btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  localStorage.setItem(STORAGE_PREFIX+'last_cat', cat);
+  renderLevels();
+}
+
+// ============================================================
+// RENDER LEVELS
+// ============================================================
+function renderLevels() {
+  levelList.style.display = 'flex';
+  gameContainer.style.display = 'none';
+  levelList.innerHTML = '';
+  updateProgress();
+
+  var unlocked = getUnlocked();
+
+  // Zone labels
+  var zones = {
+    1: { label: 'Levels 1–3 · Present & Past', class: '' },
+    4: { label: 'Levels 4–6 · Future & Conditional', class: 'future-zone' },
+    7: { label: 'Levels 7–8 · Subjunctive & Gustar', class: '' },
+    9: { label: 'Levels 9–10 · H1 Territory', class: 'h1-zone' },
+  };
+
+  for (var i = 1; i <= 10; i++) {
+    // Insert zone label
+    if (zones[i]) {
+      var zl = document.createElement('div');
+      zl.className = 'zone-label';
+      zl.textContent = zones[i].label;
+      levelList.appendChild(zl);
+    }
+
+    var btn = document.createElement('button');
+    var best = getBest(currentCat, i);
+    var locked = i > unlocked;
+    var stars = best ? '⭐'.repeat(parseInt(best)) + '☆'.repeat(3-parseInt(best)) : '';
+    var zoneClass = i >= 9 ? 'h1-zone' : i >= 4 && i <= 6 ? 'future-zone' : '';
+
+    btn.className = 'level-btn' + (zoneClass ? ' '+zoneClass : '');
+
+    var leftText = (locked ? '🔒 ' : '') + 'Level ' + i;
+    var rightText = stars ? stars : (locked ? '' : '—');
+
+    btn.innerHTML = '<span>' + leftText + '</span><span class="level-badge">' + rightText + '</span>';
+    btn.disabled = locked;
+
+    (function(level) {
+      btn.addEventListener('click', function() { startGame(level); });
+    })(i);
+    levelList.appendChild(btn);
+  }
+
+  // Brother button
+  if (brotherUnlocked()) {
+    var bb = document.createElement('button');
+    bb.textContent = '🧓 The Brother is ready — enter now';
+    bb.className = 'level-btn brother-btn';
+    bb.addEventListener('click', function() {
+      localStorage.setItem('lc_turbo_data', JSON.stringify(getTurboData()));
+      window.location.href = 'brother.html';
+    });
+    levelList.appendChild(bb);
+  }
+}
+
+function updateProgress() {
+  var stars = getTotalStars();
+  var pct = Math.min(100, Math.round((stars / BROTHER_UNLOCK) * 100));
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-pct').textContent = pct + '%';
+
+  var banner = document.getElementById('star-banner');
+  if (brotherUnlocked()) {
+    banner.textContent = '🎉 ' + stars + ' stars — The Brother is unlocked!';
+    banner.style.background = '#e8f5ee';
+    banner.style.borderColor = '#2d5a27';
+    banner.style.color = '#1a5c38';
+  } else {
+    banner.textContent = '⭐ ' + stars + ' star' + (stars !== 1 ? 's' : '') + ' earned — need ' + BROTHER_UNLOCK + ' to unlock The Brother';
+  }
+}
+
+// ============================================================
+// START GAME
+// ============================================================
+function startGame(level) {
+  currentLevel = level;
+  localStorage.setItem(STORAGE_PREFIX+'last_level', level);
+
+  // Get phrases for this level from current category
+  var pool = PHRASES[currentCat].filter(function(p) { return p.lv === level; });
+
+  // If not enough in this exact level, pull from adjacent
+  if (pool.length < QUESTIONS_PER_LEVEL) {
+    var extra = PHRASES[currentCat].filter(function(p) { return Math.abs(p.lv - level) === 1; });
+    pool = pool.concat(extra);
+  }
+
+  currentPhrases = shuffleArray(pool.slice()).slice(0, QUESTIONS_PER_LEVEL);
+
+  levelList.style.display = 'none';
+  gameContainer.style.display = 'block';
+  questionsContainer.innerHTML = '';
+  resultsContainer.innerHTML = '';
+
+  currentPhrases.forEach(function(phrase, idx) {
+    var div = document.createElement('div');
+    div.innerHTML = `
+      <div class="prompt-row">
+        <strong>${phrase.en}</strong>
+        <button class="speak-prompt" onclick="speakPrompt('${phrase.en.replace(/'/g,"\\'")}')" title="Read aloud">🔊</button>
+      </div>
+      <input type="text" data-answer="${phrase.tl.replace(/"/g,'&quot;')}" placeholder="Escribe en español..." autocomplete="off" autocorrect="off">
+      <button class="voice-btn-inline" data-idx="${idx}" onclick="startVoice(this, ${idx})">🎤 Speak</button>
+    `;
+    questionsContainer.appendChild(div);
+  });
+
+  startTimer();
+}
+
+function shuffleArray(arr) {
+  return arr.sort(function() { return Math.random() - 0.5; });
+}
+
+// ============================================================
+// TIMER
+// ============================================================
+function startTimer() {
+  startTime = Date.now();
+  timerInterval = setInterval(function() {
+    var elapsed = Math.floor((Date.now() - startTime) / 1000);
+    document.getElementById('timer').textContent = 'Time: ' + elapsed + 's';
+  }, 1000);
+}
+function stopTimer() { clearInterval(timerInterval); }
+
+// ============================================================
+// SUBMIT
+// ============================================================
+document.getElementById('submit').addEventListener('click', function() {
+  stopTimer();
+  var elapsed = Math.floor((Date.now() - startTime) / 1000);
+  var penalty = 0;
+  var correct = 0;
+  var total = currentPhrases.length;
+
+  document.querySelectorAll('#questions input').forEach(function(input) {
+    var userAns    = input.value.trim();
+    var correctAns = input.dataset.answer;
+    if (normalise(userAns) === normalise(correctAns)) {
+      correct++;
+      input.style.border = '2px solid #27ae60';
+      input.style.background = '#f0fff4';
+    } else {
+      penalty += PENALTY_SECS;
+      input.style.border = '2px solid #e74c3c';
+      input.style.background = '#fff5f5';
+    }
+  });
+
+  var totalTime = elapsed + penalty;
+
+  var stars = 0;
+  if (correct === total && totalTime <= levelUnlockTime(currentLevel)) stars = 3;
+  else if (correct === total) stars = 2;
+  else if (correct >= Math.ceil(total * 0.5)) stars = 1;
+
+  setBest(currentCat, currentLevel, stars);
+  if (stars >= 1) setUnlocked(currentLevel + 1);
+
+  // Results
+  resultsContainer.innerHTML = '<h3>Finished!</h3>'
+    + '<p>Correct: ' + correct + '/' + total + '</p>'
+    + '<p>Time: ' + elapsed + 's + Penalty: ' + penalty + 's = <strong>' + totalTime + 's</strong></p>'
+    + '<p style="font-size:1.4rem">' + '⭐'.repeat(stars) + '☆'.repeat(3-stars) + '</p>'
+    + '<h4>What you missed:</h4>';
+
+  document.querySelectorAll('#questions input').forEach(function(input) {
+    var userAns    = input.value.trim();
+    var correctAns = input.dataset.answer;
+    if (normalise(userAns) !== normalise(correctAns)) {
+      var p = document.createElement('p');
+      p.style.cssText = 'margin:6px 0; font-size:0.92rem;';
+      var engLabel = input.closest('div').querySelector('strong').textContent;
+      p.innerHTML = '<strong>' + engLabel + '</strong><br>'
+        + '✅ <span style="color:#27ae60">' + correctAns + '</span><br>'
+        + '❌ <span style="color:#e74c3c">' + (userAns || '(blank)') + '</span>';
+      resultsContainer.appendChild(p);
+    }
+  });
+
+  if (correct === total) {
+    var cel = document.createElement('div');
+    cel.className = 'perfect-celebration';
+    cel.textContent = stars === 3 ? '🎉 PERFECT — 3 stars! 🎉' : '✅ All correct!';
+    resultsContainer.prepend(cel);
+    if (stars === 3) setTimeout(function() { cel.textContent = ''; }, 5000);
+  }
+
+  if (stars >= 1) {
+    var uMsg = document.createElement('p');
+    uMsg.className = 'unlock-msg';
+    uMsg.textContent = '🔓 Level ' + (currentLevel + 1) + ' unlocked!';
+    resultsContainer.appendChild(uMsg);
+  }
+
+  updateProgress();
+  if (brotherUnlocked()) {
+    var bMsg = document.createElement('p');
+    bMsg.className = 'unlock-msg';
+    bMsg.innerHTML = '🧓 You\'ve earned The Brother! <a href="brother.html" style="color:#1a5c38;font-weight:bold;" onclick="saveTurboData()">Enter →</a>';
+    resultsContainer.appendChild(bMsg);
+  }
+
+  var tryBtn = document.createElement('button');
+  tryBtn.textContent = 'Try Again';
+  tryBtn.className = 'try-again';
+  tryBtn.onclick = function() { startGame(currentLevel); };
+  resultsContainer.appendChild(tryBtn);
+
+  var backBtn = document.createElement('button');
+  backBtn.textContent = '← Back to Levels';
+  backBtn.id = 'back-button';
+  backBtn.onclick = function() { renderLevels(); };
+  resultsContainer.appendChild(backBtn);
+});
+
+function saveTurboData() {
+  localStorage.setItem('lc_turbo_data', JSON.stringify(getTurboData()));
+}
+
+function levelUnlockTime(level) {
+  return 130 - (level - 1) * 8;
+}
+
+function normalise(s) {
+  return String(s).toLowerCase()
+    .replace(/\.\.\./g,'')
+    .replace(/[áàâä]/g,'a').replace(/[éèêë]/g,'e')
+    .replace(/[íîï]/g,'i').replace(/[óôö]/g,'o')
+    .replace(/[úûü]/g,'u').replace(/[ç]/g,'c')
+    .replace(/[ñ]/g,'n').replace(/[¿¡]/g,'')
+    .replace(/\s+/g,' ').trim();
+}
+
+// ============================================================
+// VOICE — read aloud + speech input
+// ============================================================
+function speakPrompt(text) {
+  if (!('speechSynthesis' in window)) return;
+  var utt = new SpeechSynthesisUtterance(text);
+  utt.lang = 'en-IE';
+  utt.rate = 0.9;
+  window.speechSynthesis.speak(utt);
+}
+
+var activeRecognition = null;
+
+function startVoice(btn, idx) {
+  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+    alert('Voice input works best in Chrome.');
+    return;
+  }
+  if (activeRecognition) { activeRecognition.stop(); }
+
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  var rec = new SR();
+  rec.lang = 'es-ES';
+  rec.continuous = false;
+  rec.interimResults = false;
+  activeRecognition = rec;
+
+  btn.classList.add('listening');
+  btn.textContent = '🔴 Listening...';
+
+  rec.onresult = function(e) {
+    var transcript = e.results[0][0].transcript;
+    var inputs = document.querySelectorAll('#questions input');
+    if (inputs[idx]) inputs[idx].value = transcript;
+  };
+  rec.onend = function() {
+    btn.classList.remove('listening');
+    btn.textContent = '🎤 Speak';
+    activeRecognition = null;
+  };
+  rec.onerror = function() {
+    btn.classList.remove('listening');
+    btn.textContent = '🎤 Speak';
+    activeRecognition = null;
+  };
+  rec.start();
+}
+
+// ============================================================
+// INIT
+// ============================================================
+renderLevels();
+</script>
+</body>
+</html>
