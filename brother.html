@@ -822,16 +822,29 @@ function selectGrade(btn) {
   state.grade = btn.dataset.grade;
 }
 
+function countTurboStarsNow() {
+  var total = 0;
+  ['dialogue','diary','note','opinion','formal'].forEach(function(cat) {
+    for (var lv = 1; lv <= 10; lv++) {
+      var s = localStorage.getItem('lc_turbo_best_' + cat + '_' + lv);
+      if (s) total += (parseInt(s) || 0);
+    }
+  });
+  return total;
+}
+
 function enterBrother() {
   var name = document.getElementById('inp-name').value.trim();
   if (!name) { document.getElementById('inp-name').focus(); return; }
   if (!state.grade) { alert('Pick your target grade first.'); return; }
 
-  // Gate check
-  if (state.totalStars < 5) {
-    var note = document.getElementById('turbo-stars-note');
-    note.textContent = '⚠️ You need 5 stars from Turbo first. You have ' + state.totalStars + '.';
-    note.style.color = '#c0392b';
+  var liveStars = countTurboStarsNow();
+  state.totalStars = liveStars;
+
+  var note = document.getElementById('turbo-stars-note');
+  if (liveStars < 5) {
+    note.textContent = '\u26a0\ufe0f You need 5 Turbo stars to enter. You have ' + liveStars + '. Go earn them first.';
+    note.style.color = '#e67e22';
     note.style.fontStyle = 'normal';
     note.style.fontWeight = 'bold';
     return;
@@ -841,7 +854,6 @@ function enterBrother() {
   localStorage.setItem('lc_brother_name', name);
   localStorage.setItem('lc_brother_grade', state.grade);
 
-  // Restore history
   var saved = localStorage.getItem('lc_brother_history');
   state.history = saved ? JSON.parse(saved) : [];
 
