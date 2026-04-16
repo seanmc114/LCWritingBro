@@ -156,12 +156,12 @@
     .crit-desc { font-size: 0.83rem; color: var(--ink); line-height: 1.55; }
     .close-btn { width: 100%; margin-top: 16px; padding: 12px; background: var(--ink); color: white; border: none; border-radius: 10px; font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 0.9rem; cursor: pointer; }
 
-    /* Improved writing */
+    /* Improved writing — side by side */
     .improved-card { background: white; border: 2px solid var(--gold); border-radius: 14px; padding: 16px 18px; }
     .improved-label { font-size: 0.66rem; font-weight: 900; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
-    .improved-intro { font-size: 0.82rem; color: var(--muted); margin-bottom: 12px; font-style: italic; line-height: 1.4; }
-    .improved-text { font-family: 'Lora', serif; font-size: 0.92rem; line-height: 1.75; color: var(--ink); white-space: pre-wrap; }
-    .improved-note { display: inline; background: #fff8e1; border: 1px solid #f39c12; border-radius: 4px; padding: 1px 6px; font-family: 'Nunito', sans-serif; font-size: 0.72rem; color: #7f4f00; font-weight: 700; font-style: normal; }
+    .improved-intro { font-size: 0.82rem; color: var(--muted); margin-bottom: 14px; font-style: italic; line-height: 1.4; }
+    .improved-text { font-family: 'Lora', serif; font-size: 0.9rem; line-height: 1.8; color: var(--ink); }
+    .improved-note { display: inline-block; background: #fff8e1; border: 1px solid #f39c12; border-radius: 4px; padding: 1px 7px; font-family: 'Nunito', sans-serif; font-size: 0.7rem; color: #7f4f00; font-weight: 700; font-style: normal; margin-left: 4px; vertical-align: middle; }
 
     footer { text-align: center; font-size: 0.66rem; color: rgba(255,255,255,0.18); padding: 10px; flex-shrink: 0; }
     footer.light { color: var(--muted); }
@@ -206,6 +206,12 @@
     <div class="welcome-card">
       <label class="field-label">Your first name</label>
       <input class="field-input" id="inp-name" type="text" placeholder="What do they call you?" maxlength="30" autocomplete="off">
+      <label class="field-label">Your language</label>
+      <div class="grade-row" style="margin-bottom:16px;">
+        <button class="grade-btn hl" type="button" data-lang="es" onclick="selectLang(this)">🇪🇸 Spanish</button>
+        <button class="grade-btn hl" type="button" data-lang="fr" onclick="selectLang(this)">🇫🇷 French</button>
+        <button class="grade-btn hl" type="button" data-lang="de" onclick="selectLang(this)">🇩🇪 German</button>
+      </div>
       <label class="field-label">Your target grade</label>
       <div class="grade-row">
         <button class="grade-btn hl" type="button" data-grade="H1" onclick="selectGrade(this)">H1</button>
@@ -339,7 +345,7 @@ const PROMPTS = {
 // STATE
 // ============================================================
 const state = {
-  name: '', grade: 'H3',
+  name: '', grade: 'H3', lang: 'es',
   turboData: null, totalStars: 0,
   currentPrompt: null, currentType: null,
   attempts: [],
@@ -360,7 +366,16 @@ window.addEventListener('DOMContentLoaded', function() {
   if (localStorage.getItem('lc_first_visit') === 'no') state.firstVisit = false;
   const up = localStorage.getItem('lc_used_prompts');
   if (up) state.usedPrompts = JSON.parse(up);
-  state.turboData = JSON.parse(localStorage.getItem('lc_turbo_data') || 'null');
+
+  // Restore language — use whatever they last played in Turbo
+  const savedLang = localStorage.getItem('lc_turbo_lang') || localStorage.getItem('lc_brother_lang') || 'es';
+  state.lang = savedLang;
+  document.querySelectorAll('[data-lang]').forEach(b => {
+    if (b.dataset.lang === savedLang) b.classList.add('selected');
+    else b.classList.remove('selected');
+  });
+
+  state.turboData = JSON.parse(localStorage.getItem('lc_turbo_data_' + state.lang) || 'null');
   state.totalStars = countStars();
 
   const note = document.getElementById('turbo-note');
@@ -380,7 +395,7 @@ function countStars() {
   let t = 0;
   TYPE_KEYS.forEach(cat => {
     for (let lv = 1; lv <= 10; lv++) {
-      const s = localStorage.getItem('lc_turbo_best_' + cat + '_' + lv);
+      const s = localStorage.getItem('lc_turbo_' + state.lang + '_best_' + cat + '_' + lv);
       if (s) t += parseInt(s) || 0;
     }
   });
@@ -390,6 +405,19 @@ function countStars() {
 // ============================================================
 // WELCOME
 // ============================================================
+function selectLang(btn) {
+  document.querySelectorAll('[data-lang]').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  state.lang = btn.dataset.lang;
+  // Reload turbo data for this language
+  state.turboData = JSON.parse(localStorage.getItem('lc_turbo_data_' + state.lang) || 'null');
+  state.totalStars = countStars();
+  const note = document.getElementById('turbo-note');
+  note.textContent = state.totalStars > 0
+    ? '⭐ ' + state.totalStars + ' Turbo star' + (state.totalStars !== 1 ? 's' : '') + ' — he\'ll know.'
+    : 'Play Turbo first to earn stars.';
+}
+
 function selectGrade(btn) {
   document.querySelectorAll('.grade-btn').forEach(b => b.classList.remove('selected'));
   btn.classList.add('selected');
@@ -400,10 +428,12 @@ function enterBrother() {
   const name = document.getElementById('inp-name').value.trim();
   if (!name) { document.getElementById('inp-name').focus(); return; }
   if (!state.grade) { alert('Pick your target grade first.'); return; }
+  if (!state.lang) { alert('Pick your language first.'); return; }
   state.name = name;
   state.totalStars = countStars();
   localStorage.setItem('lc_brother_name', name);
   localStorage.setItem('lc_brother_grade', state.grade);
+  localStorage.setItem('lc_brother_lang', state.lang);
   showReveal();
 }
 
@@ -428,7 +458,8 @@ function showReveal() {
 }
 
 function goToCoach() {
-  document.getElementById('header-grade').textContent = 'Section C · Target: ' + state.grade;
+  const langNames = { es: 'Spanish', fr: 'French', de: 'German' };
+  document.getElementById('header-grade').textContent = langNames[state.lang] + ' · Section C · Target: ' + state.grade;
   showScreen('screen-coach');
   document.getElementById('coach-body').innerHTML = '';
   openingGreeting();
@@ -560,6 +591,7 @@ async function submitWriting() {
       body: JSON.stringify({
         mode: 'lc_mark',
         name: state.name, grade: state.grade,
+        lang: state.lang,
         section_type: state.currentType,
         prompt_title: state.currentPrompt.title,
         prompt_bullets: state.currentPrompt.bullets,
