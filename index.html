@@ -589,70 +589,53 @@ function startGame(level) {
   startTimer();
 }
 
-// Split a phrase into two meaningful chunks.
-// Finds ALL valid split points, then picks one at random for variety.
-// Both halves must be at least 5 words — no fragments.
+// Split a phrase into two chunks of at least 5 words each.
+// Splits on English only — finds all valid English join points, picks one at random.
+// Maps the split position proportionally to find the nearest Spanish word boundary.
 function splitPhrase(p) {
-  // Connectors/prepositions to split on — right half keeps the joining word
   var joiners = [
-    { en: ' because ', tl: ' porque ' },
-    { en: ' although ', tl: ' aunque ' },
-    { en: ' but ', tl: ' pero ' },
-    { en: ' and ', tl: ' y ' },
-    { en: ' so ', tl: ' así que ' },
-    { en: ' when ', tl: ' cuando ' },
-    { en: ' if ', tl: ' si ' },
-    { en: ' since ', tl: ' desde que ' },
-    { en: ' after ', tl: ' después de ' },
-    { en: ' before ', tl: ' antes de ' },
-    { en: ' with ', tl: ' con ' },
-    { en: ' without ', tl: ' sin ' },
-    { en: ' to ', tl: ' para ' },
-    { en: ' for ', tl: ' para ' },
-    { en: ' in ', tl: ' en ' },
-    { en: ' at ', tl: ' a ' },
-    { en: ' by ', tl: ' por ' },
+    ' because ', ' although ', ' however ', ' but ', ' and ',
+    ' so ', ' when ', ' if ', ' since ', ' after ', ' before ',
+    ' with ', ' without ', ' to ', ' for ', ' in order ',
   ];
+
+  var enWords = p.en.trim().split(/\s+/);
+  var tlWords = p.tl.trim().split(/\s+/);
+
+  // Need at least 10 words in English to split into two 5-word halves
+  if (enWords.length < 10 || tlWords.length < 8) return [p];
 
   var validSplits = [];
 
   joiners.forEach(function(j) {
-    // Find all occurrences in the English string
-    var searchEn = p.en.toLowerCase();
-    var idx = 0;
-    while (true) {
-      var pos = searchEn.indexOf(j.en, idx);
-      if (pos === -1) break;
-      idx = pos + 1;
+    var pos = p.en.toLowerCase().indexOf(j);
+    if (pos <= 0) return;
 
-      // Must not be at the very start
-      if (pos === 0) continue;
+    var enA = p.en.substring(0, pos).trim();
+    var enB = p.en.substring(pos).trim(); // keeps the joiner word
 
-      var enA = p.en.substring(0, pos).trim();
-      var enB = (j.en.trim() + ' ' + p.en.substring(pos + j.en.length)).trim();
+    if (wordCount(enA) < 5 || wordCount(enB) < 5) return;
 
-      // Find matching split in Spanish
-      var searchTl = p.tl.toLowerCase();
-      var tlPos = searchTl.indexOf(j.tl);
-      if (tlPos === -1) continue;
+    // Find proportional split point in Spanish
+    var ratio = enA.split(/\s+/).length / enWords.length;
+    var tlSplitWord = Math.round(ratio * tlWords.length);
+    // Clamp so both halves have at least 4 Spanish words
+    tlSplitWord = Math.max(4, Math.min(tlSplitWord, tlWords.length - 4));
 
-      var tlA = p.tl.substring(0, tlPos).trim();
-      var tlB = (j.tl.trim() + ' ' + p.tl.substring(tlPos + j.tl.length)).trim();
+    var tlA = tlWords.slice(0, tlSplitWord).join(' ');
+    var tlB = tlWords.slice(tlSplitWord).join(' ');
 
-      // Enforce 5-word minimum on all four halves
-      if (wordCount(enA) >= 5 && wordCount(enB) >= 5 &&
-          wordCount(tlA) >= 5 && wordCount(tlB) >= 5) {
-        validSplits.push([
-          { en: enA, tl: tlA, lv: p.lv },
-          { en: enB, tl: tlB, lv: p.lv },
-        ]);
-      }
-    }
+    if (wordCount(tlA) < 4 || wordCount(tlB) < 4) return;
+
+    validSplits.push([
+      { en: enA, tl: tlA, lv: p.lv },
+      { en: enB, tl: tlB, lv: p.lv },
+    ]);
   });
 
-  if (validSplits.length === 0) return [p]; // no valid split — use whole phrase
+  if (validSplits.length === 0) return [p];
 
-  // Pick a random valid split for variety
+  // Pick randomly for variety
   return validSplits[Math.floor(Math.random() * validSplits.length)];
 }
 
