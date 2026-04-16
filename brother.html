@@ -156,6 +156,13 @@
     .crit-desc { font-size: 0.83rem; color: var(--ink); line-height: 1.55; }
     .close-btn { width: 100%; margin-top: 16px; padding: 12px; background: var(--ink); color: white; border: none; border-radius: 10px; font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 0.9rem; cursor: pointer; }
 
+    /* Improved writing */
+    .improved-card { background: white; border: 2px solid var(--gold); border-radius: 14px; padding: 16px 18px; }
+    .improved-label { font-size: 0.66rem; font-weight: 900; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+    .improved-intro { font-size: 0.82rem; color: var(--muted); margin-bottom: 12px; font-style: italic; line-height: 1.4; }
+    .improved-text { font-family: 'Lora', serif; font-size: 0.92rem; line-height: 1.75; color: var(--ink); white-space: pre-wrap; }
+    .improved-note { display: inline; background: #fff8e1; border: 1px solid #f39c12; border-radius: 4px; padding: 1px 6px; font-family: 'Nunito', sans-serif; font-size: 0.72rem; color: #7f4f00; font-weight: 700; font-style: normal; }
+
     footer { text-align: center; font-size: 0.66rem; color: rgba(255,255,255,0.18); padding: 10px; flex-shrink: 0; }
     footer.light { color: var(--muted); }
     @keyframes spin { to { transform: rotate(360deg); } }
@@ -613,6 +620,19 @@ function showMark(mark) {
     body.appendChild(presc);
   }
 
+  // Improved writing — shown when below target grade threshold
+  if (mark.improved_writing) {
+    const imp = document.createElement('div');
+    imp.className = 'improved-card';
+    imp.innerHTML = '<div class="improved-label">✏️ Your answer — improved</div>' +
+      '<div class="improved-intro">Same ideas. Same voice. Here\'s what it looks like with the gaps fixed. The highlighted notes show you exactly what changed and why.</div>' +
+      '<div class="improved-text" id="improved-text"></div>';
+    body.appendChild(imp);
+    // Render [NOTE: ...] tags as styled inline chips
+    const textEl = imp.querySelector('#improved-text');
+    textEl.innerHTML = formatImproved(mark.improved_writing);
+  }
+
   const actions = document.createElement('div');
   actions.className = 'action-row';
   actions.innerHTML =
@@ -763,6 +783,14 @@ function buildTurboSummary() {
     const max = Math.max(...Object.keys(d.levels || {'0':0}).map(Number));
     return (d.label || cat) + ': ' + stars + ' stars, level ' + max;
   }).join(' | ');
+}
+
+function formatImproved(text) {
+  if (!text) return '';
+  // Escape HTML first, then convert [NOTE: ...] to styled chips
+  let escaped = escHtml(text);
+  escaped = escaped.replace(/\[NOTE:\s*(.*?)\]/g, '<span class="improved-note">💡 $1</span>');
+  return escaped.replace(/\n/g, '<br>');
 }
 
 function formatFeedback(text) {
